@@ -1,0 +1,24 @@
+{
+  "name": "smartration-run",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keshavraopilli749/smart-ration-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/keshavraopilli749/smart-ration-app/issues"
+  },
+  "homepage": "https://github.com/keshavraopilli749/smart-ration-app#readme",
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}
