@@ -11,7 +11,7 @@ Book a ration collection slot, get a QR token, skip the line.
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/badge/license-MIT-green)](#license)
 
-[Demo](#-demo) · [Features](#-features) · [Getting started](#-getting-started) · [Roadmap](#-roadmap)
+[Demo](https://smart-ration-app.vercel.app/) · [Features](#-features) · [Getting started](#-getting-started) · [Roadmap](#-roadmap)
 
 </div>
 
