@@ -1,11 +1,10 @@
 // main.jsx
-import React from "react";
+import React2 from "react";
 import { createRoot } from "react-dom/client";
 
 // ../SmartRation.jsx
-import { useState, useEffect, useCallback, useRef, createContext, useContext } from "react";
+import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 var T = {
   teal: "#0B6E6A",
   tealLight: "#E6F4F3",
@@ -750,6 +749,7 @@ var LANG_OPTIONS = [
   { code: "ur", label: "\u0627\u0631\u062F\u0648" },
   { code: "as", label: "\u0985\u09B8\u09AE\u09C0\u09AF\u09BC\u09BE" }
 ];
+var getLangLabel = (code) => LANG_OPTIONS.find((option) => option.code === code)?.label || code;
 var SLOTS = [
   { time: "09:00 AM", left: 5 },
   { time: "09:30 AM", left: 0 },
@@ -790,6 +790,11 @@ var NOTIFICATIONS = [
   { icon: "\u{1F4E2}", type: "amber", title: "Shop holiday notice", msg: "Your ration shop will remain closed on Sunday, 5 July.", time: "27 Jun \xB7 10:00 AM", unread: true },
   { icon: "\u2705", type: "success", title: "Ration collected successfully", msg: "Your May 2026 ration collection was completed.", time: "04 Jun \xB7 11:22 AM", unread: false }
 ];
+var AUTH_USERS = {
+  citizen: { name: "Ravi Sharma", password: "citizen123", role: "citizen" },
+  shopkeeper: { name: "Suresh Kumar", password: "shopkeeper123", role: "shopkeeper" },
+  admin: { name: "Anita Kapoor", password: "admin123", role: "admin" }
+};
 var AppCtx = createContext(null);
 var useApp = () => useContext(AppCtx);
 var Icon = ({ name, size = 18, color = "currentColor", ...p }) => {
@@ -832,7 +837,7 @@ var Icon = ({ name, size = 18, color = "currentColor", ...p }) => {
     megaphone: "M11 5L6 9H2v6h4l5 4V5z M15.54 8.46a5 5 0 010 7.07 M19.07 4.93a10 10 0 010 14.14",
     checkCircle: "M22 11.08V12a10 10 0 11-5.93-9.14 M22 4L12 14.01l-3-3"
   };
-  return /* @__PURE__ */ jsx(
+  return /* @__PURE__ */ React.createElement(
     "svg",
     {
       width: size,
@@ -844,12 +849,12 @@ var Icon = ({ name, size = 18, color = "currentColor", ...p }) => {
       strokeLinecap: "round",
       strokeLinejoin: "round",
       "aria-hidden": "true",
-      ...p,
-      children: (paths[name] || "").split(" M").map((d, i) => /* @__PURE__ */ jsx("path", { d: i === 0 ? d : "M" + d }, i))
-    }
+      ...p
+    },
+    (paths[name] || "").split(" M").map((d, i) => /* @__PURE__ */ React.createElement("path", { key: i, d: i === 0 ? d : "M" + d }))
   );
 };
-var Avatar = ({ initials, size = 36, color = T.teal, bg = T.tealLight }) => /* @__PURE__ */ jsx("div", { style: {
+var Avatar = ({ initials, size = 36, color = T.teal, bg = T.tealLight }) => /* @__PURE__ */ React.createElement("div", { style: {
   width: size,
   height: size,
   borderRadius: "50%",
@@ -862,8 +867,8 @@ var Avatar = ({ initials, size = 36, color = T.teal, bg = T.tealLight }) => /* @
   justifyContent: "center",
   flexShrink: 0,
   letterSpacing: "0.5px"
-}, children: initials });
-var Badge = ({ children, color = T.teal, bg = T.tealLight }) => /* @__PURE__ */ jsx("span", { style: {
+} }, initials);
+var Badge = ({ children, color = T.teal, bg = T.tealLight }) => /* @__PURE__ */ React.createElement("span", { style: {
   display: "inline-flex",
   alignItems: "center",
   gap: 4,
@@ -874,7 +879,7 @@ var Badge = ({ children, color = T.teal, bg = T.tealLight }) => /* @__PURE__ */ 
   letterSpacing: "0.4px",
   color,
   background: bg
-}, children });
+} }, children);
 var StatusBadge = ({ status }) => {
   const map = {
     Waiting: { color: T.amber, bg: T.amberLight },
@@ -883,12 +888,12 @@ var StatusBadge = ({ status }) => {
     Active: { color: T.green, bg: T.greenLight }
   };
   const s = map[status] || map.Upcoming;
-  return /* @__PURE__ */ jsx(Badge, { color: s.color, bg: s.bg, children: status });
+  return /* @__PURE__ */ React.createElement(Badge, { color: s.color, bg: s.bg }, status);
 };
 var Toast = ({ toast }) => {
   if (!toast) return null;
   const colors = { success: T.green, info: T.blue, error: T.red };
-  return /* @__PURE__ */ jsxs("div", { role: "alert", "aria-live": "polite", style: {
+  return /* @__PURE__ */ React.createElement("div", { role: "alert", "aria-live": "polite", style: {
     position: "fixed",
     bottom: 28,
     left: "50%",
@@ -905,12 +910,9 @@ var Toast = ({ toast }) => {
     fontSize: 13,
     fontWeight: 500,
     whiteSpace: "nowrap"
-  }, children: [
-    /* @__PURE__ */ jsx("span", { style: { color: colors[toast.type] || T.green }, children: /* @__PURE__ */ jsx(Icon, { name: toast.type === "error" ? "x" : "checkCircle", size: 16, color: "currentColor" }) }),
-    toast.message
-  ] });
+  } }, /* @__PURE__ */ React.createElement("span", { style: { color: colors[toast.type] || T.green } }, /* @__PURE__ */ React.createElement(Icon, { name: toast.type === "error" ? "x" : "checkCircle", size: 16, color: "currentColor" })), toast.message);
 };
-var Skeleton = ({ w = "100%", h = 16, r = 6 }) => /* @__PURE__ */ jsx("div", { style: {
+var Skeleton = ({ w = "100%", h = 16, r = 6 }) => /* @__PURE__ */ React.createElement("div", { style: {
   width: w,
   height: h,
   borderRadius: r,
@@ -919,16 +921,10 @@ var Skeleton = ({ w = "100%", h = 16, r = 6 }) => /* @__PURE__ */ jsx("div", { s
 } });
 var Brand = ({ compact = false }) => {
   const { t } = useApp();
-  return /* @__PURE__ */ jsxs("div", { style: { display: "flex", alignItems: "center", gap: 10 }, children: [
-    /* @__PURE__ */ jsx("img", { src: "./smart-ration.png", alt: "Smart Ration logo", style: { width: 40, height: 40, borderRadius: 12, objectFit: "cover", boxShadow: "0 12px 28px rgba(15,23,42,0.12)" } }),
-    !compact && /* @__PURE__ */ jsxs("div", { children: [
-      /* @__PURE__ */ jsx("div", { style: { fontWeight: 800, fontSize: 15, color: T.ink, letterSpacing: "-0.4px" }, children: t.appName }),
-      /* @__PURE__ */ jsx("div", { style: { fontSize: 10, color: T.muted, marginTop: 1 }, children: t.tagline })
-    ] })
-  ] });
+  return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("img", { src: "./smart-ration.png", alt: "Smart Ration logo", style: { width: 40, height: 40, borderRadius: 12, objectFit: "cover", boxShadow: "0 12px 28px rgba(15,23,42,0.12)" } }), !compact && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 15, color: T.ink, letterSpacing: "-0.4px" } }, t.appName), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: T.muted, marginTop: 1 } }, t.tagline)));
 };
 var CitizenSidebar = ({ view, setView, open, onClose }) => {
-  const { t, notifCount } = useApp();
+  const { t, notifCount, logout: logout2 } = useApp();
   const navItems = [
     { id: "home", icon: "home", label: t.home },
     { id: "book", icon: "calendar", label: t.bookSlot },
@@ -936,118 +932,87 @@ var CitizenSidebar = ({ view, setView, open, onClose }) => {
     { id: "notifications", icon: "bell", label: t.notifications, badge: notifCount },
     { id: "profile", icon: "user", label: t.profile }
   ];
-  return /* @__PURE__ */ jsxs(Fragment, { children: [
-    open && /* @__PURE__ */ jsx("div", { onClick: onClose, style: {
-      position: "fixed",
-      inset: 0,
-      background: "rgba(15,23,42,0.45)",
-      zIndex: 29
-    }, "aria-hidden": "true" }),
-    /* @__PURE__ */ jsxs("aside", { role: "navigation", "aria-label": "Main navigation", style: {
-      position: "fixed",
-      top: 0,
-      bottom: 0,
-      left: 0,
-      width: 260,
-      background: T.white,
-      borderRight: `1px solid ${T.line}`,
-      display: "flex",
-      flexDirection: "column",
-      padding: "0 14px",
-      zIndex: 30,
-      transform: open ? "none" : "translateX(-100%)",
-      transition: "transform 0.22s ease"
-    }, children: [
-      /* @__PURE__ */ jsxs("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", height: 78, padding: "0 8px" }, children: [
-        /* @__PURE__ */ jsx(Brand, {}),
-        /* @__PURE__ */ jsx("button", { onClick: onClose, "aria-label": "Close menu", style: {
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          padding: 6,
-          borderRadius: 8,
-          color: T.slate
-        }, children: /* @__PURE__ */ jsx(Icon, { name: "x", size: 18, color: "currentColor" }) })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { style: { margin: "0 8px 18px", padding: 16, borderRadius: 18, background: T.tealLight, border: `1px solid ${T.teal}` }, children: [
-        /* @__PURE__ */ jsx("p", { style: { fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", margin: 0, color: T.tealDark }, children: t.rationReady }),
-        /* @__PURE__ */ jsx("p", { style: { fontSize: 16, fontWeight: 800, margin: "10px 0 4px", color: T.ink }, children: "Collect before 05 Jul" }),
-        /* @__PURE__ */ jsxs("p", { style: { fontSize: 11, color: T.slate, margin: 0 }, children: [
-          t.atShop,
-          " Shastri Nagar FPS"
-        ] })
-      ] }),
-      /* @__PURE__ */ jsx("p", { style: { fontSize: 9.5, fontWeight: 800, letterSpacing: "1.2px", color: T.muted, padding: "0 10px 6px" }, children: "QUICK ACCESS" }),
-      /* @__PURE__ */ jsx("nav", { children: navItems.map((item) => /* @__PURE__ */ jsxs(
-        "button",
-        {
-          onClick: () => {
-            setView(item.id);
-            onClose();
-          },
-          "aria-current": view === item.id ? "page" : void 0,
-          style: {
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            padding: "12px 14px",
-            borderRadius: 12,
-            border: "none",
-            cursor: "pointer",
-            background: view === item.id ? T.tealLight : "transparent",
-            color: view === item.id ? T.tealDark : T.slate,
-            fontWeight: view === item.id ? 700 : 500,
-            fontSize: 13,
-            textAlign: "left",
-            marginBottom: 4,
-            transition: "all 0.14s"
-          },
-          children: [
-            /* @__PURE__ */ jsx(Icon, { name: item.icon, size: 18, color: "currentColor" }),
-            /* @__PURE__ */ jsx("span", { style: { flex: 1 }, children: item.label }),
-            item.badge > 0 && /* @__PURE__ */ jsx("span", { style: {
-              background: T.red,
-              color: "#fff",
-              fontSize: 10,
-              fontWeight: 700,
-              borderRadius: 10,
-              padding: "1px 6px"
-            }, children: item.badge })
-          ]
-        },
-        item.id
-      )) }),
-      /* @__PURE__ */ jsx("div", { style: { marginTop: "auto", margin: "auto 8px 16px", background: T.tealLight, borderRadius: 14, padding: 16, color: T.tealDark }, children: /* @__PURE__ */ jsxs("div", { style: { display: "flex", gap: 10, alignItems: "flex-start" }, children: [
-        /* @__PURE__ */ jsx(Icon, { name: "help", size: 18, color: T.teal }),
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("div", { style: { fontWeight: 700, fontSize: 11, marginBottom: 4 }, children: t.needHelp }),
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 11, color: T.slate, margin: 0, lineHeight: 1.5 }, children: "Call 1800-111-155 or visit your linked FPS." })
-        ] })
-      ] }) }),
-      /* @__PURE__ */ jsxs("button", { style: {
+  return /* @__PURE__ */ React.createElement(React.Fragment, null, open && /* @__PURE__ */ React.createElement("div", { onClick: onClose, style: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(15,23,42,0.45)",
+    zIndex: 29
+  }, "aria-hidden": "true" }), /* @__PURE__ */ React.createElement("aside", { role: "navigation", "aria-label": "Main navigation", style: {
+    position: "fixed",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: 260,
+    background: T.white,
+    borderRight: `1px solid ${T.line}`,
+    display: "flex",
+    flexDirection: "column",
+    padding: "0 14px",
+    zIndex: 30,
+    transform: open ? "none" : "translateX(-100%)",
+    transition: "transform 0.22s ease"
+  } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", height: 78, padding: "0 8px" } }, /* @__PURE__ */ React.createElement(Brand, null), /* @__PURE__ */ React.createElement("button", { onClick: onClose, "aria-label": "Close menu", style: {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    padding: 6,
+    borderRadius: 8,
+    color: T.slate
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "x", size: 18, color: "currentColor" }))), /* @__PURE__ */ React.createElement("div", { style: { margin: "0 8px 18px", padding: 16, borderRadius: 18, background: T.tealLight, border: `1px solid ${T.teal}` } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", margin: 0, color: T.tealDark } }, t.rationReady), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 16, fontWeight: 800, margin: "10px 0 4px", color: T.ink } }, "Collect before 05 Jul"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: T.slate, margin: 0 } }, t.atShop, " Shastri Nagar FPS")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 9.5, fontWeight: 800, letterSpacing: "1.2px", color: T.muted, padding: "0 10px 6px" } }, "QUICK ACCESS"), /* @__PURE__ */ React.createElement("nav", null, navItems.map((item) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: item.id,
+      onClick: () => {
+        setView(item.id);
+        onClose();
+      },
+      "aria-current": view === item.id ? "page" : void 0,
+      style: {
+        width: "100%",
         display: "flex",
         alignItems: "center",
-        gap: 10,
-        padding: "14px 10px",
-        background: "transparent",
+        gap: 12,
+        padding: "12px 14px",
+        borderRadius: 12,
         border: "none",
         cursor: "pointer",
-        color: T.slate,
-        fontWeight: 600,
-        fontSize: 12,
-        borderRadius: 0
-      }, children: [
-        /* @__PURE__ */ jsx(Icon, { name: "logout", size: 16, color: "currentColor" }),
-        t.logout
-      ] }),
-      /* @__PURE__ */ jsx("div", { style: { fontSize: 9, color: T.muted, textAlign: "center", paddingBottom: 10 }, children: "Premium dashboard" })
-    ] })
-  ] });
+        background: view === item.id ? T.tealLight : "transparent",
+        color: view === item.id ? T.tealDark : T.slate,
+        fontWeight: view === item.id ? 700 : 500,
+        fontSize: 13,
+        textAlign: "left",
+        marginBottom: 4,
+        transition: "all 0.14s"
+      }
+    },
+    /* @__PURE__ */ React.createElement(Icon, { name: item.icon, size: 18, color: "currentColor" }),
+    /* @__PURE__ */ React.createElement("span", { style: { flex: 1 } }, item.label),
+    item.badge > 0 && /* @__PURE__ */ React.createElement("span", { style: {
+      background: T.red,
+      color: "#fff",
+      fontSize: 10,
+      fontWeight: 700,
+      borderRadius: 10,
+      padding: "1px 6px"
+    } }, item.badge)
+  ))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: "auto", margin: "auto 8px 16px", background: T.tealLight, borderRadius: 14, padding: 16, color: T.tealDark } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement(Icon, { name: "help", size: 18, color: T.teal }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 11, marginBottom: 4 } }, t.needHelp), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: T.slate, margin: 0, lineHeight: 1.5 } }, "Call 1800-111-155 or visit your linked FPS.")))), /* @__PURE__ */ React.createElement("button", { onClick: logout2, style: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    padding: "14px 10px",
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    color: T.slate,
+    fontWeight: 600,
+    fontSize: 12,
+    borderRadius: 0
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "logout", size: 16, color: "currentColor" }), t.logout), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9, color: T.muted, textAlign: "center", paddingBottom: 10 } }, "Premium dashboard")));
 };
 var Topbar = ({ onMenu }) => {
-  const { role, setRole, setLang, lang, t, notifCount, setView } = useApp();
-  return /* @__PURE__ */ jsxs("header", { className: "premium-topbar", style: {
+  const { role, setRole, setLang, lang, t, notifCount, setView, user, logout: logout2 } = useApp();
+  const initials = user?.name?.split(" ").map((w) => w[0]).join("") || "RS";
+  return /* @__PURE__ */ React.createElement("header", { className: "premium-topbar", style: {
     position: "sticky",
     top: 0,
     zIndex: 20,
@@ -1059,9 +1024,90 @@ var Topbar = ({ onMenu }) => {
     height: 72,
     padding: "0 24px",
     gap: 14
-  }, children: [
-    /* @__PURE__ */ jsxs("div", { style: { display: "flex", alignItems: "center", gap: 14 }, children: [
-      /* @__PURE__ */ jsx("button", { onClick: onMenu, "aria-label": "Open navigation menu", style: {
+  } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 14 } }, /* @__PURE__ */ React.createElement("button", { onClick: onMenu, "aria-label": "Open navigation menu", style: {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    padding: 8,
+    borderRadius: 10,
+    color: T.slate,
+    display: "flex"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "menu", size: 20, color: "currentColor" })), /* @__PURE__ */ React.createElement(Brand, { compact: true })), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", alignItems: "center", gap: 12, minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: {
+    flex: 1,
+    minWidth: 0,
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    background: T.bg,
+    border: `1px solid ${T.line}`,
+    borderRadius: 16,
+    padding: "10px 14px"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "search", size: 16, color: T.muted }), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "search",
+      placeholder: "Ask Smart Ration or find a shop",
+      "aria-label": "Search or ask the assistant",
+      style: {
+        width: "100%",
+        background: "transparent",
+        border: "none",
+        outline: "none",
+        color: T.ink,
+        fontSize: 13,
+        fontWeight: 500
+      }
+    }
+  )), /* @__PURE__ */ React.createElement(Badge, { color: T.tealDark, bg: T.tealLight }, t.readyToCollect)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: T.muted } }, t.viewAs), /* @__PURE__ */ React.createElement(
+    "select",
+    {
+      value: role,
+      onChange: (e) => setRole(e.target.value),
+      "aria-label": "Switch demo role",
+      style: {
+        fontSize: 11,
+        fontWeight: 600,
+        color: T.ink,
+        background: T.bg,
+        border: `1px solid ${T.line}`,
+        borderRadius: 10,
+        padding: "6px 22px 6px 10px",
+        cursor: "pointer",
+        appearance: "none"
+      }
+    },
+    /* @__PURE__ */ React.createElement("option", { value: "citizen" }, t.citizen),
+    /* @__PURE__ */ React.createElement("option", { value: "shopkeeper" }, t.shopkeeper),
+    /* @__PURE__ */ React.createElement("option", { value: "admin" }, t.administrator)
+  )), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 3, minWidth: 110 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 9, color: T.muted, textAlign: "right" } }, LANG_OPTIONS.length, " languages"), /* @__PURE__ */ React.createElement(
+    "select",
+    {
+      value: lang,
+      onChange: (e) => setLang(e.target.value),
+      "aria-label": "Switch language",
+      style: {
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        gap: 5,
+        padding: "6px 10px",
+        background: T.bg,
+        border: `1px solid ${T.line}`,
+        borderRadius: 10,
+        cursor: "pointer",
+        color: T.slate,
+        fontSize: 11,
+        fontWeight: 600
+      }
+    },
+    LANG_OPTIONS.map((option) => /* @__PURE__ */ React.createElement("option", { key: option.code, value: option.code }, option.label))
+  )), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => setView && setView("notifications"),
+      "aria-label": `Notifications, ${notifCount} unread`,
+      style: {
+        position: "relative",
         background: "transparent",
         border: "none",
         cursor: "pointer",
@@ -1069,155 +1115,44 @@ var Topbar = ({ onMenu }) => {
         borderRadius: 10,
         color: T.slate,
         display: "flex"
-      }, children: /* @__PURE__ */ jsx(Icon, { name: "menu", size: 20, color: "currentColor" }) }),
-      /* @__PURE__ */ jsx(Brand, { compact: true })
-    ] }),
-    /* @__PURE__ */ jsxs("div", { style: { flex: 1, display: "flex", alignItems: "center", gap: 12, minWidth: 0 }, children: [
-      /* @__PURE__ */ jsxs("div", { style: {
-        flex: 1,
-        minWidth: 0,
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        background: T.bg,
-        border: `1px solid ${T.line}`,
-        borderRadius: 16,
-        padding: "10px 14px"
-      }, children: [
-        /* @__PURE__ */ jsx(Icon, { name: "search", size: 16, color: T.muted }),
-        /* @__PURE__ */ jsx(
-          "input",
-          {
-            type: "search",
-            placeholder: "Ask Smart Ration or find a shop",
-            "aria-label": "Search or ask the assistant",
-            style: {
-              width: "100%",
-              background: "transparent",
-              border: "none",
-              outline: "none",
-              color: T.ink,
-              fontSize: 13,
-              fontWeight: 500
-            }
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsx(Badge, { color: T.tealDark, bg: T.tealLight, children: t.readyToCollect })
-    ] }),
-    /* @__PURE__ */ jsxs("div", { style: { display: "flex", alignItems: "center", gap: 10 }, children: [
-      /* @__PURE__ */ jsxs("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
-        /* @__PURE__ */ jsx("span", { style: { fontSize: 11, color: T.muted }, children: t.viewAs }),
-        /* @__PURE__ */ jsxs(
-          "select",
-          {
-            value: role,
-            onChange: (e) => setRole(e.target.value),
-            "aria-label": "Switch demo role",
-            style: {
-              fontSize: 11,
-              fontWeight: 600,
-              color: T.ink,
-              background: T.bg,
-              border: `1px solid ${T.line}`,
-              borderRadius: 10,
-              padding: "6px 22px 6px 10px",
-              cursor: "pointer",
-              appearance: "none"
-            },
-            children: [
-              /* @__PURE__ */ jsx("option", { value: "citizen", children: t.citizen }),
-              /* @__PURE__ */ jsx("option", { value: "shopkeeper", children: t.shopkeeper }),
-              /* @__PURE__ */ jsx("option", { value: "admin", children: t.administrator })
-            ]
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxs("div", { style: { display: "flex", flexDirection: "column", gap: 3, minWidth: 110 }, children: [
-        /* @__PURE__ */ jsxs("span", { style: { fontSize: 9, color: T.muted, textAlign: "right" }, children: [
-          LANG_OPTIONS.length,
-          " languages"
-        ] }),
-        /* @__PURE__ */ jsx(
-          "select",
-          {
-            value: lang,
-            onChange: (e) => setLang(e.target.value),
-            "aria-label": "Switch language",
-            style: {
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              gap: 5,
-              padding: "6px 10px",
-              background: T.bg,
-              border: `1px solid ${T.line}`,
-              borderRadius: 10,
-              cursor: "pointer",
-              color: T.slate,
-              fontSize: 11,
-              fontWeight: 600
-            },
-            children: LANG_OPTIONS.map((option) => /* @__PURE__ */ jsx("option", { value: option.code, children: option.label }, option.code))
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxs(
-        "button",
-        {
-          onClick: () => setView && setView("notifications"),
-          "aria-label": `Notifications, ${notifCount} unread`,
-          style: {
-            position: "relative",
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            padding: 8,
-            borderRadius: 10,
-            color: T.slate,
-            display: "flex"
-          },
-          children: [
-            /* @__PURE__ */ jsx(Icon, { name: "bell", size: 20, color: "currentColor" }),
-            notifCount > 0 && /* @__PURE__ */ jsx("span", { "aria-hidden": "true", style: {
-              position: "absolute",
-              top: 4,
-              right: 4,
-              width: 8,
-              height: 8,
-              background: T.red,
-              borderRadius: "50%",
-              border: `2px solid ${T.white}`
-            } })
-          ]
-        }
-      ),
-      /* @__PURE__ */ jsx(Avatar, { initials: "RS", size: 34 })
-    ] })
-  ] });
-};
-var PageIntro = ({ eyebrow, title, desc, onBack }) => /* @__PURE__ */ jsxs("div", { style: { marginBottom: 24 }, children: [
-  onBack && /* @__PURE__ */ jsxs("button", { onClick: onBack, style: {
-    display: "flex",
-    alignItems: "center",
-    gap: 4,
-    background: "transparent",
-    border: "none",
+      }
+    },
+    /* @__PURE__ */ React.createElement(Icon, { name: "bell", size: 20, color: "currentColor" }),
+    notifCount > 0 && /* @__PURE__ */ React.createElement("span", { "aria-hidden": "true", style: {
+      position: "absolute",
+      top: 4,
+      right: 4,
+      width: 8,
+      height: 8,
+      background: T.red,
+      borderRadius: "50%",
+      border: `2px solid ${T.white}`
+    } })
+  ), /* @__PURE__ */ React.createElement(Avatar, { initials, size: 34 }), /* @__PURE__ */ React.createElement("button", { onClick: logout2, style: {
+    background: T.bg,
+    border: `1px solid ${T.line}`,
+    borderRadius: 10,
+    padding: "8px 12px",
+    color: T.slate,
     cursor: "pointer",
-    color: T.teal,
-    fontSize: 12,
-    fontWeight: 600,
-    padding: "0 0 12px",
-    marginBottom: 4
-  }, children: [
-    /* @__PURE__ */ jsx(Icon, { name: "chevronL", size: 16, color: "currentColor" }),
-    " Back"
-  ] }),
-  eyebrow && /* @__PURE__ */ jsx("p", { style: { fontSize: 9.5, fontWeight: 800, letterSpacing: "1.4px", color: T.teal, margin: "0 0 5px" }, children: eyebrow }),
-  /* @__PURE__ */ jsx("h1", { style: { fontSize: 26, fontWeight: 800, letterSpacing: "-0.6px", color: T.ink, margin: "0 0 5px" }, children: title }),
-  desc && /* @__PURE__ */ jsx("p", { style: { fontSize: 13, color: T.slate, margin: 0 }, children: desc })
-] });
-var StatCard = ({ icon, iconColor, iconBg, label, value, sub, subColor, action, onAction, loading, delay = 0 }) => /* @__PURE__ */ jsxs("div", { className: "premium-surface", style: {
+    fontSize: 11,
+    fontWeight: 700
+  } }, "Logout")));
+};
+var PageIntro = ({ eyebrow, title, desc, onBack }) => /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 24 } }, onBack && /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: {
+  display: "flex",
+  alignItems: "center",
+  gap: 4,
+  background: "transparent",
+  border: "none",
+  cursor: "pointer",
+  color: T.teal,
+  fontSize: 12,
+  fontWeight: 600,
+  padding: "0 0 12px",
+  marginBottom: 4
+} }, /* @__PURE__ */ React.createElement(Icon, { name: "chevronL", size: 16, color: "currentColor" }), " Back"), eyebrow && /* @__PURE__ */ React.createElement("p", { style: { fontSize: 9.5, fontWeight: 800, letterSpacing: "1.4px", color: T.teal, margin: "0 0 5px" } }, eyebrow), /* @__PURE__ */ React.createElement("h1", { style: { fontSize: 26, fontWeight: 800, letterSpacing: "-0.6px", color: T.ink, margin: "0 0 5px" } }, title), desc && /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, color: T.slate, margin: 0 } }, desc));
+var StatCard = ({ icon, iconColor, iconBg, label, value, sub, subColor, action, onAction, loading, delay = 0 }) => /* @__PURE__ */ React.createElement("div", { className: "premium-surface", style: {
   background: T.white,
   border: `1px solid ${T.line}`,
   borderRadius: 16,
@@ -1228,47 +1163,31 @@ var StatCard = ({ icon, iconColor, iconBg, label, value, sub, subColor, action, 
   boxShadow: "0 10px 28px rgba(15,23,42,0.04)",
   animation: `riseIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both`,
   animationDelay: `${delay}ms`
-}, children: [
-  /* @__PURE__ */ jsx("div", { style: {
-    width: 44,
-    height: 44,
-    borderRadius: 11,
-    background: iconBg,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)"
-  }, children: /* @__PURE__ */ jsx(Icon, { name: icon, size: 20, color: iconColor }) }),
-  /* @__PURE__ */ jsx("div", { style: { flex: 1, minWidth: 0 }, children: loading ? /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsx(Skeleton, { h: 10, w: "60%" }),
-    /* @__PURE__ */ jsx("div", { style: { height: 6 } }),
-    /* @__PURE__ */ jsx(Skeleton, { h: 18, w: "80%" })
-  ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsx("p", { style: { fontSize: 9, fontWeight: 800, letterSpacing: "0.8px", color: T.muted, margin: "0 0 6px" }, children: label }),
-    /* @__PURE__ */ jsx("p", { style: { fontSize: 17, fontWeight: 800, color: T.ink, margin: "0 0 5px" }, children: value }),
-    sub && /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: subColor || T.muted, margin: 0 }, children: sub }),
-    action && /* @__PURE__ */ jsxs("button", { onClick: onAction, style: {
-      display: "inline-flex",
-      alignItems: "center",
-      gap: 3,
-      marginTop: 5,
-      background: "transparent",
-      border: "none",
-      cursor: "pointer",
-      color: T.blue,
-      fontSize: 10,
-      fontWeight: 700,
-      padding: 0
-    }, children: [
-      action,
-      " ",
-      /* @__PURE__ */ jsx(Icon, { name: "arrowUR", size: 13, color: "currentColor" })
-    ] })
-  ] }) })
-] });
+} }, /* @__PURE__ */ React.createElement("div", { style: {
+  width: 44,
+  height: 44,
+  borderRadius: 11,
+  background: iconBg,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)"
+} }, /* @__PURE__ */ React.createElement(Icon, { name: icon, size: 20, color: iconColor })), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } }, loading ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(Skeleton, { h: 10, w: "60%" }), /* @__PURE__ */ React.createElement("div", { style: { height: 6 } }), /* @__PURE__ */ React.createElement(Skeleton, { h: 18, w: "80%" })) : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 9, fontWeight: 800, letterSpacing: "0.8px", color: T.muted, margin: "0 0 6px" } }, label), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 17, fontWeight: 800, color: T.ink, margin: "0 0 5px" } }, value), sub && /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: subColor || T.muted, margin: 0 } }, sub), action && /* @__PURE__ */ React.createElement("button", { onClick: onAction, style: {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 3,
+  marginTop: 5,
+  background: "transparent",
+  border: "none",
+  cursor: "pointer",
+  color: T.blue,
+  fontSize: 10,
+  fontWeight: 700,
+  padding: 0
+} }, action, " ", /* @__PURE__ */ React.createElement(Icon, { name: "arrowUR", size: 13, color: "currentColor" })))));
 var HomeView = () => {
-  const { t, setView, showToast } = useApp();
+  const { t, setView, showToast: showToast2 } = useApp();
   const [loading, setLoading] = useState(true);
   const [prompt, setPrompt] = useState("");
   const loadingTimerRef = useRef(null);
@@ -1284,7 +1203,7 @@ var HomeView = () => {
     if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
     setLoading(true);
     loadingTimerRef.current = setTimeout(() => setLoading(false), 800);
-    showToast({ message: "Workspace refreshed", type: "info" });
+    showToast2({ message: "Workspace refreshed", type: "info" });
   };
   const askAssistant = (text) => {
     if (!text.trim()) return;
@@ -1293,413 +1212,297 @@ var HomeView = () => {
     else if (next.includes("token") || next.includes("booking")) setView("booking");
     else if (next.includes("profile") || next.includes("family")) setView("profile");
     else setView("notifications");
-    showToast({ message: `Assistant opened: ${text}`, type: "info" });
+    showToast2({ message: `Assistant opened: ${text}`, type: "info" });
     setPrompt("");
   };
-  return /* @__PURE__ */ jsxs("div", { style: {
+  return /* @__PURE__ */ React.createElement("div", { style: {
     maxWidth: 1120,
     margin: "0 auto",
     padding: "8px 0 24px",
     position: "relative"
-  }, children: [
-    /* @__PURE__ */ jsx("div", { style: {
-      position: "absolute",
-      inset: "-20px -40px auto",
-      height: 240,
-      pointerEvents: "none",
-      opacity: 0.85,
-      background: "radial-gradient(circle at 18% 12%, rgba(20,148,142,0.18), transparent 30%), radial-gradient(circle at 82% 8%, rgba(29,78,216,0.16), transparent 26%), radial-gradient(circle at 55% 0%, rgba(16,185,129,0.10), transparent 22%)",
-      filter: "blur(10px)"
-    } }),
-    /* @__PURE__ */ jsx(PageIntro, { eyebrow: `MONDAY, 29 JUNE`, title: t.rationReady, desc: t.rationReadyDesc }),
-    /* @__PURE__ */ jsxs("div", { style: {
-      background: `linear-gradient(135deg, rgba(8,84,80,0.98) 0%, rgba(20,148,142,0.92) 44%, rgba(29,78,216,0.85) 100%)`,
-      borderRadius: 24,
-      color: "#fff",
-      padding: "28px 30px",
-      marginBottom: 22,
-      position: "relative",
-      overflow: "hidden",
-      boxShadow: "0 24px 70px rgba(15,23,42,0.18)",
-      animation: "riseIn 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) both"
-    }, children: [
-      /* @__PURE__ */ jsxs("div", { style: { position: "relative", zIndex: 2, display: "grid", gridTemplateColumns: "1.4fr 0.95fr", gap: 20, alignItems: "start" }, children: [
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsxs("div", { style: { display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsx(Badge, { color: "#dafaf7", bg: "rgba(255,255,255,0.12)", children: t.rationReady }),
-            /* @__PURE__ */ jsx(Badge, { color: "#dbeafe", bg: "rgba(255,255,255,0.10)", children: "June allocation" })
-          ] }),
-          /* @__PURE__ */ jsx("h2", { style: { fontWeight: 800, fontSize: 34, lineHeight: 1.03, margin: "0 0 12px", letterSpacing: "-0.9px" }, children: "Your ration is ready. Collect it on time." }),
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 14, color: "rgba(237, 247, 247, 0.95)", margin: "0 0 24px", maxWidth: 560 }, children: "Track your collection window, check latest slots, and open your digital token from one premium dashboard." }),
-          /* @__PURE__ */ jsxs("div", { style: { display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 12, marginBottom: 22 }, children: [
-            /* @__PURE__ */ jsxs("div", { style: { background: "rgba(255,255,255,0.12)", borderRadius: 18, padding: 18, border: "1px solid rgba(255,255,255,0.14)" }, children: [
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.72)", margin: 0 }, children: "Next slot" }),
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 22, fontWeight: 800, margin: "10px 0 4px" }, children: "10:30 AM" }),
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 11, color: "rgba(255,255,255,0.78)", margin: 0 }, children: "Best window today" })
-            ] }),
-            /* @__PURE__ */ jsxs("div", { style: { background: "rgba(255,255,255,0.12)", borderRadius: 18, padding: 18, border: "1px solid rgba(255,255,255,0.14)" }, children: [
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.72)", margin: 0 }, children: "Family covered" }),
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 22, fontWeight: 800, margin: "10px 0 4px" }, children: "4 members" }),
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 11, color: "rgba(255,255,255,0.78)", margin: 0 }, children: "Verified ration card" })
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { style: { display: "flex", flexWrap: "wrap", gap: 12 }, children: [
-            /* @__PURE__ */ jsxs("button", { onClick: () => setView("book"), style: {
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "14px 18px",
-              background: "#fff",
-              color: T.tealDark,
-              border: "none",
-              borderRadius: 16,
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 800,
-              boxShadow: "0 10px 24px rgba(15,23,42,0.18)"
-            }, children: [
-              t.bookSlot,
-              " ",
-              /* @__PURE__ */ jsx(Icon, { name: "chevronR", size: 16, color: "currentColor" })
-            ] }),
-            /* @__PURE__ */ jsx("button", { onClick: () => setView("booking"), style: {
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "14px 18px",
-              background: "rgba(255,255,255,0.15)",
-              color: "#fff",
-              border: "1px solid rgba(255,255,255,0.22)",
-              borderRadius: 16,
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 700
-            }, children: t.viewDigitalToken })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { className: "premium-surface", style: {
-          background: "rgba(255,255,255,0.10)",
-          border: "1px solid rgba(255,255,255,0.16)",
-          borderRadius: 20,
-          padding: 22,
-          backdropFilter: "blur(12px)",
-          boxShadow: "0 18px 36px rgba(8,15,35,0.14)"
-        }, children: [
-          /* @__PURE__ */ jsxs("div", { style: { marginBottom: 18 }, children: [
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 10, letterSpacing: "1.2px", margin: "0 0 6px", color: "rgba(255,255,255,0.72)", fontWeight: 800 }, children: "AI assistant" }),
-            /* @__PURE__ */ jsx("h3", { style: { margin: 0, fontSize: 18, fontWeight: 800 }, children: "Quick actions" })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { style: { display: "flex", alignItems: "center", gap: 10, padding: "14px", background: "rgba(255,255,255,0.12)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.16)" }, children: [
-            /* @__PURE__ */ jsx(Icon, { name: "scan", size: 18, color: "#fff" }),
-            /* @__PURE__ */ jsx(
-              "input",
-              {
-                value: prompt,
-                onChange: (e) => setPrompt(e.target.value),
-                onKeyDown: (e) => {
-                  if (e.key === "Enter") askAssistant(prompt);
-                },
-                placeholder: "Ask the assistant what to do next",
-                style: {
-                  width: "100%",
-                  background: "transparent",
-                  border: "none",
-                  outline: "none",
-                  color: "#fff",
-                  fontSize: 13,
-                  fontWeight: 500
-                }
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxs("div", { style: { display: "grid", gap: 10, marginTop: 18 }, children: [
-            /* @__PURE__ */ jsx("button", { onClick: () => askAssistant(prompt || "Book my slot"), style: {
-              width: "100%",
-              padding: "12px 14px",
-              borderRadius: 14,
-              background: T.teal,
-              color: "#fff",
-              border: "none",
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 700
-            }, children: "Open assistant" }),
-            /* @__PURE__ */ jsx("button", { onClick: () => setView("notifications"), style: {
-              width: "100%",
-              padding: "12px 14px",
-              borderRadius: 14,
-              background: "rgba(255,255,255,0.12)",
-              border: "1px solid rgba(255,255,255,0.16)",
-              color: "#fff",
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 700
-            }, children: "Review notifications" })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ jsx("div", { className: "hero-orb", style: {
-        position: "absolute",
-        inset: "auto -40px -60px auto",
-        width: 240,
-        height: 240,
-        borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 55%, transparent 70%)"
-      } })
-    ] }),
-    /* @__PURE__ */ jsxs("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }, children: [
-      /* @__PURE__ */ jsxs("div", { children: [
-        /* @__PURE__ */ jsx("h2", { style: { fontSize: 15, fontWeight: 800, margin: 0, color: T.ink }, children: t.atAGlance }),
-        /* @__PURE__ */ jsx("p", { style: { fontSize: 11, color: T.muted, margin: "4px 0 0" }, children: "Priority cards keep the rest out of the way." })
-      ] }),
-      /* @__PURE__ */ jsxs(
-        "button",
-        {
-          onClick: refreshDashboard,
-          className: "premium-button",
-          style: {
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            background: "#fff",
-            border: `1px solid ${T.line}`,
-            cursor: "pointer",
-            color: T.teal,
-            fontSize: 11,
-            fontWeight: 700,
-            padding: "9px 12px",
-            borderRadius: 999,
-            boxShadow: "0 10px 22px rgba(15,23,42,0.04)"
-          },
-          children: [
-            /* @__PURE__ */ jsx(Icon, { name: "refresh", size: 14, color: "currentColor" }),
-            " ",
-            t.refresh
-          ]
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxs("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 14, marginBottom: 22 }, children: [
-      /* @__PURE__ */ jsx(
-        StatCard,
-        {
-          loading,
-          delay: 0,
-          icon: "package",
-          iconColor: T.green,
-          iconBg: T.greenLight,
-          label: t.rationStatus,
-          value: t.readyToCollect,
-          sub: `\u25CF ${t.stockAvailable}`,
-          subColor: T.green
-        }
-      ),
-      /* @__PURE__ */ jsx(
-        StatCard,
-        {
-          loading,
-          delay: 90,
-          icon: "calendar",
-          iconColor: T.blue,
-          iconBg: T.blueLight,
-          label: t.nextBooking,
-          value: t.noSlotBooked,
-          action: t.bookNow,
-          onAction: () => setView("book")
-        }
-      ),
-      /* @__PURE__ */ jsx(
-        StatCard,
-        {
-          loading,
-          delay: 180,
-          icon: "users",
-          iconColor: T.amber,
-          iconBg: T.amberLight,
-          label: t.familyMembers,
-          value: "4 Members",
-          sub: "3 adults \xB7 1 child"
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxs("div", { className: "premium-surface", style: {
-      background: "rgba(255,255,255,0.86)",
-      border: `1px solid rgba(226,232,240,0.9)`,
-      borderRadius: 20,
-      display: "flex",
-      alignItems: "center",
-      gap: 16,
-      padding: "18px 20px",
-      marginBottom: 22,
-      flexWrap: "wrap",
-      boxShadow: "0 18px 44px rgba(15,23,42,0.06)",
-      backdropFilter: "blur(10px)",
-      animation: "riseIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both",
-      animationDelay: "120ms"
-    }, children: [
-      /* @__PURE__ */ jsx("div", { style: { width: 46, height: 46, borderRadius: 14, background: "linear-gradient(135deg, #ecfeff 0%, #dbeafe 100%)", display: "flex", alignItems: "center", justifyContent: "center" }, children: /* @__PURE__ */ jsx(Icon, { name: "zap", size: 20, color: T.teal }) }),
-      /* @__PURE__ */ jsxs("div", { style: { flex: 1, minWidth: 180 }, children: [
-        /* @__PURE__ */ jsx("h3", { style: { fontSize: 14, fontWeight: 800, margin: "0 0 4px", color: T.ink }, children: t.skipQueue }),
-        /* @__PURE__ */ jsx("p", { style: { fontSize: 11, color: T.slate, margin: 0 }, children: t.skipQueueDesc })
-      ] }),
-      /* @__PURE__ */ jsxs("button", { onClick: () => setView("book"), className: "premium-button", style: {
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    position: "absolute",
+    inset: "-20px -40px auto",
+    height: 240,
+    pointerEvents: "none",
+    opacity: 0.85,
+    background: "radial-gradient(circle at 18% 12%, rgba(20,148,142,0.18), transparent 30%), radial-gradient(circle at 82% 8%, rgba(29,78,216,0.16), transparent 26%), radial-gradient(circle at 55% 0%, rgba(16,185,129,0.10), transparent 22%)",
+    filter: "blur(10px)"
+  } }), /* @__PURE__ */ React.createElement(PageIntro, { eyebrow: `MONDAY, 29 JUNE`, title: t.rationReady, desc: t.rationReadyDesc }), /* @__PURE__ */ React.createElement("div", { style: {
+    background: `linear-gradient(135deg, rgba(8,84,80,0.98) 0%, rgba(20,148,142,0.92) 44%, rgba(29,78,216,0.85) 100%)`,
+    borderRadius: 24,
+    color: "#fff",
+    padding: "28px 30px",
+    marginBottom: 22,
+    position: "relative",
+    overflow: "hidden",
+    boxShadow: "0 24px 70px rgba(15,23,42,0.18)",
+    animation: "riseIn 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) both"
+  } }, /* @__PURE__ */ React.createElement("div", { style: { position: "relative", zIndex: 2, display: "grid", gridTemplateColumns: "1.4fr 0.95fr", gap: 20, alignItems: "start" } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 16 } }, /* @__PURE__ */ React.createElement(Badge, { color: "#dafaf7", bg: "rgba(255,255,255,0.12)" }, t.rationReady), /* @__PURE__ */ React.createElement(Badge, { color: "#dbeafe", bg: "rgba(255,255,255,0.10)" }, "June allocation")), /* @__PURE__ */ React.createElement("h2", { style: { fontWeight: 800, fontSize: 34, lineHeight: 1.03, margin: "0 0 12px", letterSpacing: "-0.9px" } }, "Your ration is ready. Collect it on time."), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14, color: "rgba(237, 247, 247, 0.95)", margin: "0 0 24px", maxWidth: 560 } }, "Track your collection window, check latest slots, and open your digital token from one premium dashboard."), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: 12, marginBottom: 22 } }, /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.12)", borderRadius: 18, padding: 18, border: "1px solid rgba(255,255,255,0.14)" } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.72)", margin: 0 } }, "Next slot"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 22, fontWeight: 800, margin: "10px 0 4px" } }, "10:30 AM"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: "rgba(255,255,255,0.78)", margin: 0 } }, "Best window today")), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.12)", borderRadius: 18, padding: 18, border: "1px solid rgba(255,255,255,0.14)" } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.72)", margin: 0 } }, "Family covered"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 22, fontWeight: 800, margin: "10px 0 4px" } }, "4 members"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: "rgba(255,255,255,0.78)", margin: 0 } }, "Verified ration card"))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 12 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setView("book"), style: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "14px 18px",
+    background: "#fff",
+    color: T.tealDark,
+    border: "none",
+    borderRadius: 16,
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 800,
+    boxShadow: "0 10px 24px rgba(15,23,42,0.18)"
+  } }, t.bookSlot, " ", /* @__PURE__ */ React.createElement(Icon, { name: "chevronR", size: 16, color: "currentColor" })), /* @__PURE__ */ React.createElement("button", { onClick: () => setView("booking"), style: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "14px 18px",
+    background: "rgba(255,255,255,0.15)",
+    color: "#fff",
+    border: "1px solid rgba(255,255,255,0.22)",
+    borderRadius: 16,
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 700
+  } }, t.viewDigitalToken))), /* @__PURE__ */ React.createElement("div", { className: "premium-surface", style: {
+    background: "rgba(255,255,255,0.10)",
+    border: "1px solid rgba(255,255,255,0.16)",
+    borderRadius: 20,
+    padding: 22,
+    backdropFilter: "blur(12px)",
+    boxShadow: "0 18px 36px rgba(8,15,35,0.14)"
+  } }, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 18 } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, letterSpacing: "1.2px", margin: "0 0 6px", color: "rgba(255,255,255,0.72)", fontWeight: 800 } }, "AI assistant"), /* @__PURE__ */ React.createElement("h3", { style: { margin: 0, fontSize: 18, fontWeight: 800 } }, "Quick actions")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, padding: "14px", background: "rgba(255,255,255,0.12)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.16)" } }, /* @__PURE__ */ React.createElement(Icon, { name: "scan", size: 18, color: "#fff" }), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      value: prompt,
+      onChange: (e) => setPrompt(e.target.value),
+      onKeyDown: (e) => {
+        if (e.key === "Enter") askAssistant(prompt);
+      },
+      placeholder: "Ask the assistant what to do next",
+      style: {
+        width: "100%",
+        background: "transparent",
+        border: "none",
+        outline: "none",
+        color: "#fff",
+        fontSize: 13,
+        fontWeight: 500
+      }
+    }
+  )), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 10, marginTop: 18 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => askAssistant(prompt || "Book my slot"), style: {
+    width: "100%",
+    padding: "12px 14px",
+    borderRadius: 14,
+    background: T.teal,
+    color: "#fff",
+    border: "none",
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 700
+  } }, "Open assistant"), /* @__PURE__ */ React.createElement("button", { onClick: () => setView("notifications"), style: {
+    width: "100%",
+    padding: "12px 14px",
+    borderRadius: 14,
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.16)",
+    color: "#fff",
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 700
+  } }, "Review notifications")))), /* @__PURE__ */ React.createElement("div", { className: "hero-orb", style: {
+    position: "absolute",
+    inset: "auto -40px -60px auto",
+    width: 240,
+    height: 240,
+    borderRadius: "50%",
+    background: "radial-gradient(circle, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 55%, transparent 70%)"
+  } })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 15, fontWeight: 800, margin: 0, color: T.ink } }, t.atAGlance), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: T.muted, margin: "4px 0 0" } }, "Priority cards keep the rest out of the way.")), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: refreshDashboard,
+      className: "premium-button",
+      style: {
         display: "inline-flex",
         alignItems: "center",
-        gap: 7,
-        padding: "11px 16px",
-        background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealMid} 100%)`,
-        color: "#fff",
-        border: "none",
-        borderRadius: 999,
+        gap: 6,
+        background: "#fff",
+        border: `1px solid ${T.line}`,
         cursor: "pointer",
-        fontSize: 12,
-        fontWeight: 800,
-        boxShadow: "0 12px 26px rgba(11,110,106,0.22)"
-      }, children: [
-        t.bookSlot,
-        " ",
-        /* @__PURE__ */ jsx(Icon, { name: "chevronR", size: 16, color: "currentColor" })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxs("div", { style: { display: "grid", gridTemplateColumns: "1.55fr 1fr", gap: 16, alignItems: "start" }, children: [
-      /* @__PURE__ */ jsxs("div", { className: "premium-surface", style: {
-        background: "rgba(255,255,255,0.86)",
-        border: `1px solid rgba(226,232,240,0.9)`,
-        borderRadius: 20,
-        boxShadow: "0 18px 44px rgba(15,23,42,0.06)",
-        overflow: "hidden",
-        backdropFilter: "blur(10px)",
-        animation: "riseIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both",
-        animationDelay: "180ms"
-      }, children: [
-        /* @__PURE__ */ jsxs("div", { style: {
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "16px 20px",
-          borderBottom: `1px solid ${T.line}`
-        }, children: [
-          /* @__PURE__ */ jsxs("div", { children: [
-            /* @__PURE__ */ jsx("h3", { style: { fontSize: 14, fontWeight: 800, margin: 0, color: T.ink }, children: t.recentNotifications }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" }, children: "Signals the assistant should surface first." })
-          ] }),
-          /* @__PURE__ */ jsx("button", { onClick: () => setView("notifications"), style: {
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            color: T.teal,
-            fontSize: 11,
-            fontWeight: 800
-          }, children: "View all" })
-        ] }),
-        NOTIFICATIONS.slice(0, 2).map((n, i) => /* @__PURE__ */ jsxs("div", { style: {
-          display: "flex",
-          gap: 12,
-          padding: "15px 20px",
-          borderBottom: i < 1 ? `1px solid ${T.line}` : "none",
-          position: "relative"
-        }, children: [
-          /* @__PURE__ */ jsx("div", { style: {
-            width: 40,
-            height: 40,
-            borderRadius: 12,
-            flexShrink: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: n.type === "success" ? T.greenLight : n.type === "info" ? T.blueLight : T.amberLight,
-            fontSize: 16
-          }, children: n.icon }),
-          /* @__PURE__ */ jsxs("div", { style: { flex: 1, minWidth: 0 }, children: [
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 12, fontWeight: 800, margin: "0 0 3px", color: T.ink }, children: n.title }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.slate, margin: "0 0 4px", lineHeight: 1.5 }, children: n.msg }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 9, color: T.muted, margin: 0 }, children: n.time })
-          ] }),
-          n.unread && /* @__PURE__ */ jsx("span", { style: {
-            position: "absolute",
-            right: 18,
-            top: 18,
-            width: 6,
-            height: 6,
-            borderRadius: "50%",
-            background: T.blue
-          }, "aria-label": "Unread" })
-        ] }, i))
-      ] }),
-      /* @__PURE__ */ jsxs("div", { className: "premium-surface", style: {
-        background: "rgba(255,255,255,0.86)",
-        border: `1px solid rgba(226,232,240,0.9)`,
-        borderRadius: 20,
-        boxShadow: "0 18px 44px rgba(15,23,42,0.06)",
-        overflow: "hidden",
-        backdropFilter: "blur(10px)",
-        animation: "riseIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both",
-        animationDelay: "260ms"
-      }, children: [
-        /* @__PURE__ */ jsxs("div", { style: { padding: "16px 20px", borderBottom: `1px solid ${T.line}` }, children: [
-          /* @__PURE__ */ jsx("h3", { style: { fontSize: 14, fontWeight: 800, margin: 0, color: T.ink }, children: t.quickActions }),
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" }, children: "Guided actions with one-step completion." })
-        ] }),
-        [
-          { icon: "qr", title: t.viewDigitalToken, sub: t.showAtShop, action: () => setView("booking") },
-          { icon: "card", title: t.rationCardDetails, sub: t.viewFamily, action: () => setView("profile") },
-          { icon: "help", title: t.helpSupport, sub: "1800-111-155", action: () => showToast({ message: "Helpline number copied", type: "info" }) }
-        ].map((item, i) => /* @__PURE__ */ jsxs("button", { onClick: item.action, style: {
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          padding: "14px 20px",
-          background: "transparent",
-          border: "none",
-          borderBottom: i < 2 ? `1px solid ${T.line}` : "none",
-          cursor: "pointer",
-          textAlign: "left"
-        }, children: [
-          /* @__PURE__ */ jsx("div", { style: {
-            width: 36,
-            height: 36,
-            borderRadius: 11,
-            background: "linear-gradient(135deg, rgba(20,148,142,0.12) 0%, rgba(29,78,216,0.08) 100%)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-          }, children: /* @__PURE__ */ jsx(Icon, { name: item.icon, size: 16, color: T.teal }) }),
-          /* @__PURE__ */ jsxs("div", { style: { flex: 1 }, children: [
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 12, fontWeight: 800, margin: "0 0 2px", color: T.ink }, children: item.title }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.muted, margin: 0 }, children: item.sub })
-          ] }),
-          /* @__PURE__ */ jsx(Icon, { name: "chevronR", size: 15, color: T.muted })
-        ] }, i))
-      ] })
-    ] })
-  ] });
+        color: T.teal,
+        fontSize: 11,
+        fontWeight: 700,
+        padding: "9px 12px",
+        borderRadius: 999,
+        boxShadow: "0 10px 22px rgba(15,23,42,0.04)"
+      }
+    },
+    /* @__PURE__ */ React.createElement(Icon, { name: "refresh", size: 14, color: "currentColor" }),
+    " ",
+    t.refresh
+  )), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 14, marginBottom: 22 } }, /* @__PURE__ */ React.createElement(
+    StatCard,
+    {
+      loading,
+      delay: 0,
+      icon: "package",
+      iconColor: T.green,
+      iconBg: T.greenLight,
+      label: t.rationStatus,
+      value: t.readyToCollect,
+      sub: `\u25CF ${t.stockAvailable}`,
+      subColor: T.green
+    }
+  ), /* @__PURE__ */ React.createElement(
+    StatCard,
+    {
+      loading,
+      delay: 90,
+      icon: "calendar",
+      iconColor: T.blue,
+      iconBg: T.blueLight,
+      label: t.nextBooking,
+      value: t.noSlotBooked,
+      action: t.bookNow,
+      onAction: () => setView("book")
+    }
+  ), /* @__PURE__ */ React.createElement(
+    StatCard,
+    {
+      loading,
+      delay: 180,
+      icon: "users",
+      iconColor: T.amber,
+      iconBg: T.amberLight,
+      label: t.familyMembers,
+      value: "4 Members",
+      sub: "3 adults \xB7 1 child"
+    }
+  )), /* @__PURE__ */ React.createElement("div", { className: "premium-surface", style: {
+    background: "rgba(255,255,255,0.86)",
+    border: `1px solid rgba(226,232,240,0.9)`,
+    borderRadius: 20,
+    display: "flex",
+    alignItems: "center",
+    gap: 16,
+    padding: "18px 20px",
+    marginBottom: 22,
+    flexWrap: "wrap",
+    boxShadow: "0 18px 44px rgba(15,23,42,0.06)",
+    backdropFilter: "blur(10px)",
+    animation: "riseIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both",
+    animationDelay: "120ms"
+  } }, /* @__PURE__ */ React.createElement("div", { style: { width: 46, height: 46, borderRadius: 14, background: "linear-gradient(135deg, #ecfeff 0%, #dbeafe 100%)", display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "zap", size: 20, color: T.teal })), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 180 } }, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: 14, fontWeight: 800, margin: "0 0 4px", color: T.ink } }, t.skipQueue), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: T.slate, margin: 0 } }, t.skipQueueDesc)), /* @__PURE__ */ React.createElement("button", { onClick: () => setView("book"), className: "premium-button", style: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 7,
+    padding: "11px 16px",
+    background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealMid} 100%)`,
+    color: "#fff",
+    border: "none",
+    borderRadius: 999,
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 800,
+    boxShadow: "0 12px 26px rgba(11,110,106,0.22)"
+  } }, t.bookSlot, " ", /* @__PURE__ */ React.createElement(Icon, { name: "chevronR", size: 16, color: "currentColor" }))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1.55fr 1fr", gap: 16, alignItems: "start" } }, /* @__PURE__ */ React.createElement("div", { className: "premium-surface", style: {
+    background: "rgba(255,255,255,0.86)",
+    border: `1px solid rgba(226,232,240,0.9)`,
+    borderRadius: 20,
+    boxShadow: "0 18px 44px rgba(15,23,42,0.06)",
+    overflow: "hidden",
+    backdropFilter: "blur(10px)",
+    animation: "riseIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both",
+    animationDelay: "180ms"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "16px 20px",
+    borderBottom: `1px solid ${T.line}`
+  } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: 14, fontWeight: 800, margin: 0, color: T.ink } }, t.recentNotifications), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" } }, "Signals the assistant should surface first.")), /* @__PURE__ */ React.createElement("button", { onClick: () => setView("notifications"), style: {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    color: T.teal,
+    fontSize: 11,
+    fontWeight: 800
+  } }, "View all")), NOTIFICATIONS.slice(0, 2).map((n, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    display: "flex",
+    gap: 12,
+    padding: "15px 20px",
+    borderBottom: i < 1 ? `1px solid ${T.line}` : "none",
+    position: "relative"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    flexShrink: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: n.type === "success" ? T.greenLight : n.type === "info" ? T.blueLight : T.amberLight,
+    fontSize: 16
+  } }, n.icon), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, fontWeight: 800, margin: "0 0 3px", color: T.ink } }, n.title), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.slate, margin: "0 0 4px", lineHeight: 1.5 } }, n.msg), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 9, color: T.muted, margin: 0 } }, n.time)), n.unread && /* @__PURE__ */ React.createElement("span", { style: {
+    position: "absolute",
+    right: 18,
+    top: 18,
+    width: 6,
+    height: 6,
+    borderRadius: "50%",
+    background: T.blue
+  }, "aria-label": "Unread" })))), /* @__PURE__ */ React.createElement("div", { className: "premium-surface", style: {
+    background: "rgba(255,255,255,0.86)",
+    border: `1px solid rgba(226,232,240,0.9)`,
+    borderRadius: 20,
+    boxShadow: "0 18px 44px rgba(15,23,42,0.06)",
+    overflow: "hidden",
+    backdropFilter: "blur(10px)",
+    animation: "riseIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both",
+    animationDelay: "260ms"
+  } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "16px 20px", borderBottom: `1px solid ${T.line}` } }, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: 14, fontWeight: 800, margin: 0, color: T.ink } }, t.quickActions), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" } }, "Guided actions with one-step completion.")), [
+    { icon: "qr", title: t.viewDigitalToken, sub: t.showAtShop, action: () => setView("booking") },
+    { icon: "card", title: t.rationCardDetails, sub: t.viewFamily, action: () => setView("profile") },
+    { icon: "help", title: t.helpSupport, sub: "1800-111-155", action: () => showToast2({ message: "Helpline number copied", type: "info" }) }
+  ].map((item, i) => /* @__PURE__ */ React.createElement("button", { key: i, onClick: item.action, style: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    padding: "14px 20px",
+    background: "transparent",
+    border: "none",
+    borderBottom: i < 2 ? `1px solid ${T.line}` : "none",
+    cursor: "pointer",
+    textAlign: "left"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 36,
+    height: 36,
+    borderRadius: 11,
+    background: "linear-gradient(135deg, rgba(20,148,142,0.12) 0%, rgba(29,78,216,0.08) 100%)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: item.icon, size: 16, color: T.teal })), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, fontWeight: 800, margin: "0 0 2px", color: T.ink } }, item.title), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: 0 } }, item.sub)), /* @__PURE__ */ React.createElement(Icon, { name: "chevronR", size: 15, color: T.muted }))))));
 };
 var Stepper = ({ step }) => {
   const { t } = useApp();
   const steps = [t.chooseShop, t.selectSlot, t.confirm];
-  return /* @__PURE__ */ jsx("div", { style: { display: "flex", marginBottom: 24, gap: 0 }, children: steps.map((s, i) => /* @__PURE__ */ jsxs("div", { style: { display: "flex", flex: 1, alignItems: "center" }, children: [
-    /* @__PURE__ */ jsxs("div", { style: { display: "flex", alignItems: "center", gap: 7, whiteSpace: "nowrap" }, children: [
-      /* @__PURE__ */ jsx("div", { style: {
-        width: 24,
-        height: 24,
-        borderRadius: "50%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 10,
-        fontWeight: 700,
-        background: step > i + 1 ? T.teal : step === i + 1 ? T.teal : T.line,
-        color: step >= i + 1 ? "#fff" : T.muted,
-        transition: "all 0.2s"
-      }, children: step > i + 1 ? /* @__PURE__ */ jsx(Icon, { name: "check", size: 13, color: "#fff" }) : i + 1 }),
-      /* @__PURE__ */ jsx("span", { style: { fontSize: 11, fontWeight: 600, color: step >= i + 1 ? T.teal : T.muted }, children: s })
-    ] }),
-    i < 2 && /* @__PURE__ */ jsx("div", { style: { flex: 1, height: 1, background: step > i + 1 ? T.teal : T.line, margin: "0 8px", transition: "background 0.3s" } })
-  ] }, s)) });
+  return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", marginBottom: 24, gap: 0 } }, steps.map((s, i) => /* @__PURE__ */ React.createElement("div", { key: s, style: { display: "flex", flex: 1, alignItems: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 7, whiteSpace: "nowrap" } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 24,
+    height: 24,
+    borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 10,
+    fontWeight: 700,
+    background: step > i + 1 ? T.teal : step === i + 1 ? T.teal : T.line,
+    color: step >= i + 1 ? "#fff" : T.muted,
+    transition: "all 0.2s"
+  } }, step > i + 1 ? /* @__PURE__ */ React.createElement(Icon, { name: "check", size: 13, color: "#fff" }) : i + 1), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, fontWeight: 600, color: step >= i + 1 ? T.teal : T.muted } }, s)), i < 2 && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, height: 1, background: step > i + 1 ? T.teal : T.line, margin: "0 8px", transition: "background 0.3s" } }))));
 };
 var BookView = () => {
-  const { t, showToast, setView, setBooking, booking } = useApp();
+  const { t, showToast: showToast2, setView, setBooking, booking } = useApp();
   const [step, setStep] = useState(1);
   const [date, setDate] = useState("01 Jul");
   const [time, setTime] = useState("");
@@ -1713,528 +1516,295 @@ var BookView = () => {
   const confirm = () => {
     setBooking({ date, time, id: "SR-2026-48291", shop: "Shastri Nagar Fair Price Shop" });
     setView("booking");
-    showToast({ message: "Slot confirmed! Show QR at the shop.", type: "success" });
+    showToast2({ message: "Slot confirmed! Show QR at the shop.", type: "success" });
   };
-  return /* @__PURE__ */ jsxs("div", { style: { maxWidth: 1e3, margin: "0 auto" }, children: [
-    /* @__PURE__ */ jsx(PageIntro, { title: t.bookCollection, desc: t.bookCollectionDesc, onBack: () => setView("home") }),
-    /* @__PURE__ */ jsx(Stepper, { step }),
-    /* @__PURE__ */ jsxs("div", { style: { display: "grid", gridTemplateColumns: "minmax(0,1fr) 250px", gap: 18, alignItems: "start" }, children: [
-      /* @__PURE__ */ jsxs("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14, padding: "24px 26px" }, children: [
-        step === 1 && /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsxs("div", { style: { display: "flex", gap: 12, marginBottom: 22 }, children: [
-            /* @__PURE__ */ jsx("div", { style: {
-              width: 28,
-              height: 28,
-              borderRadius: 7,
-              background: T.tealLight,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: T.teal,
-              fontWeight: 800,
-              fontSize: 12,
-              flexShrink: 0
-            }, children: "1" }),
-            /* @__PURE__ */ jsxs("div", { children: [
-              /* @__PURE__ */ jsx("h2", { style: { fontSize: 16, fontWeight: 700, margin: "0 0 3px", color: T.ink }, children: "Choose your ration shop" }),
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 11, color: T.muted, margin: 0 }, children: "Your linked shop is selected automatically." })
-            ] })
-          ] }),
-          /* @__PURE__ */ jsx("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 18 }, children: [{ label: t.state, value: "Delhi" }, { label: t.district, value: "Central Delhi" }].map((f) => /* @__PURE__ */ jsxs("label", { style: { display: "block" }, children: [
-            /* @__PURE__ */ jsx("span", { style: { fontSize: 10, fontWeight: 700, color: T.slate, letterSpacing: "0.5px", display: "block", marginBottom: 6 }, children: f.label.toUpperCase() }),
-            /* @__PURE__ */ jsxs("div", { style: {
-              border: `1px solid ${T.line}`,
-              borderRadius: 8,
-              padding: "9px 12px",
-              background: T.bg,
-              display: "flex",
-              alignItems: "center",
-              gap: 8
-            }, children: [
-              /* @__PURE__ */ jsx(Icon, { name: "map", size: 14, color: T.muted }),
-              /* @__PURE__ */ jsx("select", { defaultValue: f.value, style: { background: "transparent", border: "none", fontSize: 12, color: T.ink, flex: 1, outline: "none" }, children: /* @__PURE__ */ jsx("option", { children: f.value }) })
-            ] })
-          ] }, f.label)) }),
-          /* @__PURE__ */ jsxs("label", { children: [
-            /* @__PURE__ */ jsx("span", { style: { fontSize: 10, fontWeight: 700, color: T.slate, letterSpacing: "0.5px", display: "block", marginBottom: 8 }, children: "RATION SHOP" }),
-            /* @__PURE__ */ jsxs("div", { style: {
-              border: `1.5px solid ${T.teal}`,
-              borderRadius: 11,
-              padding: "14px 16px",
-              background: T.tealLight,
-              display: "flex",
-              gap: 12,
-              alignItems: "center"
-            }, children: [
-              /* @__PURE__ */ jsx("div", { style: {
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                border: `2px solid ${T.teal}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }, children: /* @__PURE__ */ jsx("div", { style: { width: 4, height: 4, borderRadius: "50%", background: T.teal } }) }),
-              /* @__PURE__ */ jsx("div", { style: {
-                width: 38,
-                height: 38,
-                borderRadius: 9,
-                background: "#d2f0ed",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }, children: /* @__PURE__ */ jsx(Icon, { name: "store", size: 18, color: T.teal }) }),
-              /* @__PURE__ */ jsxs("div", { style: { flex: 1 }, children: [
-                /* @__PURE__ */ jsx("p", { style: { fontWeight: 700, fontSize: 13, margin: "0 0 3px", color: T.tealDark }, children: "Shastri Nagar Fair Price Shop" }),
-                /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.slate, margin: "0 0 5px" }, children: "FPS ID: DL-CEN-1042" }),
-                /* @__PURE__ */ jsxs("p", { style: { fontSize: 10, color: T.slate, margin: 0, display: "flex", alignItems: "center", gap: 4 }, children: [
-                  /* @__PURE__ */ jsx(Icon, { name: "map", size: 11, color: T.muted }),
-                  " 12, Main Market, Shastri Nagar \xB7 1.2 ",
-                  t.kmAway
-                ] })
-              ] }),
-              /* @__PURE__ */ jsxs(Badge, { color: T.teal, bg: "#d2f0ed", children: [
-                /* @__PURE__ */ jsx(Icon, { name: "check", size: 10, color: T.teal }),
-                " ",
-                t.linkedShop
-              ] })
-            ] })
-          ] }),
-          /* @__PURE__ */ jsx("div", { style: { display: "flex", justifyContent: "flex-end", marginTop: 24, paddingTop: 18, borderTop: `1px solid ${T.line}` }, children: /* @__PURE__ */ jsxs("button", { onClick: () => setStep(2), style: {
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "11px 20px",
-            background: T.teal,
-            color: "#fff",
-            border: "none",
-            borderRadius: 9,
-            cursor: "pointer",
-            fontSize: 12,
-            fontWeight: 700
-          }, children: [
-            t.continueBtn,
-            " ",
-            /* @__PURE__ */ jsx(Icon, { name: "chevronR", size: 15, color: "#fff" })
-          ] }) })
-        ] }),
-        step === 2 && /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsxs("div", { style: { display: "flex", gap: 12, marginBottom: 22 }, children: [
-            /* @__PURE__ */ jsx("div", { style: { width: 28, height: 28, borderRadius: 7, background: T.tealLight, display: "flex", alignItems: "center", justifyContent: "center", color: T.teal, fontWeight: 800, fontSize: 12, flexShrink: 0 }, children: "2" }),
-            /* @__PURE__ */ jsxs("div", { children: [
-              /* @__PURE__ */ jsx("h2", { style: { fontSize: 16, fontWeight: 700, margin: "0 0 3px", color: T.ink }, children: "Select date & time" }),
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 11, color: T.muted, margin: 0 }, children: "Slots are available for the next 5 working days." })
-            ] })
-          ] }),
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 10, fontWeight: 700, color: T.slate, letterSpacing: "0.5px", margin: "0 0 8px" }, children: "CHOOSE A DATE" }),
-          /* @__PURE__ */ jsx("div", { style: { display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 7, marginBottom: 22 }, children: DAYS.map((d) => /* @__PURE__ */ jsxs("button", { onClick: () => setDate(d.label), style: {
-            padding: "10px 4px",
-            border: `1.5px solid ${date === d.label ? T.teal : T.line}`,
-            borderRadius: 9,
-            background: date === d.label ? T.tealLight : T.white,
-            cursor: "pointer",
-            textAlign: "center"
-          }, children: [
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.6px", color: date === d.label ? T.teal : T.muted, margin: "0 0 4px" }, children: d.day }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 18, fontWeight: 800, color: date === d.label ? T.teal : T.ink, margin: "0 0 3px" }, children: d.date }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 8, color: date === d.label ? T.teal : T.muted, margin: 0 }, children: d.note })
-          ] }, d.label)) }),
-          /* @__PURE__ */ jsxs("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }, children: [
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 10, fontWeight: 700, color: T.slate, letterSpacing: "0.5px", margin: 0 }, children: "AVAILABLE TIME SLOTS" }),
-            /* @__PURE__ */ jsx("div", { style: { display: "flex", gap: 12 }, children: [{ dot: T.teal, label: "Available" }, { dot: T.amber, label: "Filling fast" }].map((l) => /* @__PURE__ */ jsxs("span", { style: { display: "flex", alignItems: "center", gap: 5, fontSize: 9, color: T.muted }, children: [
-              /* @__PURE__ */ jsx("span", { style: { width: 6, height: 6, borderRadius: "50%", background: l.dot, display: "inline-block" } }),
-              l.label
-            ] }, l.label)) })
-          ] }),
-          errors.time && /* @__PURE__ */ jsxs("p", { style: { fontSize: 11, color: T.red, background: T.redLight, borderRadius: 7, padding: "8px 12px", marginBottom: 10 }, children: [
-            "\u26A0 ",
-            errors.time
-          ] }),
-          /* @__PURE__ */ jsx("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(130px,1fr))", gap: 8, marginBottom: 20 }, children: SLOTS.map((s) => {
-            const few = s.left > 0 && s.left <= 3;
-            const full = s.left === 0;
-            const sel = time === s.time;
-            return /* @__PURE__ */ jsxs(
-              "button",
-              {
-                disabled: full,
-                onClick: () => {
-                  setTime(s.time);
-                  setErrors({});
-                },
-                style: {
-                  border: `1.5px solid ${sel ? T.teal : few ? T.amber : T.line}`,
-                  borderRadius: 9,
-                  background: sel ? T.tealLight : full ? T.bg : T.white,
-                  padding: "10px 10px",
-                  textAlign: "left",
-                  cursor: full ? "not-allowed" : "pointer",
-                  opacity: full ? 0.55 : 1,
-                  display: "grid",
-                  gridTemplateColumns: "18px 1fr",
-                  alignItems: "center",
-                  gap: 6
-                },
-                children: [
-                  /* @__PURE__ */ jsx(Icon, { name: "clock", size: 14, color: sel ? T.teal : T.muted }),
-                  /* @__PURE__ */ jsxs("div", { children: [
-                    /* @__PURE__ */ jsx("p", { style: { fontWeight: 700, fontSize: 11, color: sel ? T.teal : full ? T.muted : T.ink, margin: "0 0 2px", textDecoration: full ? "line-through" : "none" }, children: s.time }),
-                    /* @__PURE__ */ jsx("p", { style: { fontSize: 8, color: full ? T.muted : few ? T.amber : T.slate, margin: 0 }, children: full ? t.slotFull : `${s.left} ${t.slotsLeft}` })
-                  ] })
-                ]
-              },
-              s.time
-            );
-          }) }),
-          /* @__PURE__ */ jsxs("div", { style: { display: "flex", justifyContent: "space-between", paddingTop: 18, borderTop: `1px solid ${T.line}` }, children: [
-            /* @__PURE__ */ jsxs("button", { onClick: () => setStep(1), style: {
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "10px 16px",
-              background: T.white,
-              border: `1px solid ${T.line}`,
-              borderRadius: 9,
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 600,
-              color: T.slate
-            }, children: [
-              /* @__PURE__ */ jsx(Icon, { name: "chevronL", size: 14, color: "currentColor" }),
-              " ",
-              t.back
-            ] }),
-            /* @__PURE__ */ jsxs("button", { onClick: () => {
-              if (validateStep2()) setStep(3);
-            }, style: {
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "11px 20px",
-              background: T.teal,
-              color: "#fff",
-              border: "none",
-              borderRadius: 9,
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 700
-            }, children: [
-              "Review booking ",
-              /* @__PURE__ */ jsx(Icon, { name: "chevronR", size: 15, color: "#fff" })
-            ] })
-          ] })
-        ] }),
-        step === 3 && /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsxs("div", { style: { display: "flex", gap: 12, marginBottom: 22 }, children: [
-            /* @__PURE__ */ jsx("div", { style: { width: 28, height: 28, borderRadius: 7, background: T.tealLight, display: "flex", alignItems: "center", justifyContent: "center", color: T.teal, fontWeight: 800, fontSize: 12, flexShrink: 0 }, children: "3" }),
-            /* @__PURE__ */ jsxs("div", { children: [
-              /* @__PURE__ */ jsx("h2", { style: { fontSize: 16, fontWeight: 700, margin: "0 0 3px", color: T.ink }, children: t.reviewConfirm }),
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 11, color: T.muted, margin: 0 }, children: t.reviewDesc })
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { style: { border: `1px solid ${T.line}`, borderRadius: 12, overflow: "hidden", marginBottom: 16 }, children: [
-            /* @__PURE__ */ jsxs("div", { style: { background: T.bg, padding: "14px 16px", display: "flex", gap: 12, alignItems: "center" }, children: [
-              /* @__PURE__ */ jsx("div", { style: { width: 34, height: 34, borderRadius: 8, background: T.tealLight, display: "flex", alignItems: "center", justifyContent: "center" }, children: /* @__PURE__ */ jsx(Icon, { name: "store", size: 16, color: T.teal }) }),
-              /* @__PURE__ */ jsxs("div", { children: [
-                /* @__PURE__ */ jsx("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.5px", color: T.muted, margin: "0 0 3px" }, children: "RATION SHOP" }),
-                /* @__PURE__ */ jsx("p", { style: { fontSize: 12, fontWeight: 700, margin: "0 0 2px", color: T.ink }, children: "Shastri Nagar Fair Price Shop" }),
-                /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.muted, margin: 0 }, children: "12, Main Market, Shastri Nagar" })
-              ] })
-            ] }),
-            /* @__PURE__ */ jsx("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr" }, children: [
-              { icon: "calendar", label: "DATE", value: `${date}, 2026` },
-              { icon: "clock", label: "TIME", value: time },
-              { icon: "user", label: "CARD HOLDER", value: "Ravi Sharma" },
-              { icon: "card", label: "RATION CARD", value: "DL \u2022\u2022\u2022\u2022 4821" }
-            ].map((row, i) => /* @__PURE__ */ jsxs("div", { style: {
-              display: "flex",
-              gap: 10,
-              padding: "14px 16px",
-              alignItems: "center",
-              borderTop: `1px solid ${T.line}`,
-              borderRight: i % 2 === 0 ? `1px solid ${T.line}` : "none"
-            }, children: [
-              /* @__PURE__ */ jsx(Icon, { name: row.icon, size: 15, color: T.teal }),
-              /* @__PURE__ */ jsxs("div", { children: [
-                /* @__PURE__ */ jsx("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.5px", color: T.muted, margin: "0 0 3px" }, children: row.label }),
-                /* @__PURE__ */ jsx("p", { style: { fontSize: 11, fontWeight: 700, color: T.ink, margin: 0 }, children: row.value })
-              ] })
-            ] }, i)) })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { style: {
-            background: T.blueLight,
-            border: `1px solid #bfdbfe`,
-            borderRadius: 9,
-            padding: "11px 14px",
-            display: "flex",
-            gap: 9,
-            marginBottom: 20,
-            alignItems: "flex-start"
-          }, children: [
-            /* @__PURE__ */ jsx(Icon, { name: "shield", size: 16, color: T.blue }),
-            /* @__PURE__ */ jsxs("p", { style: { fontSize: 11, color: "#1e40af", margin: 0, lineHeight: 1.6 }, children: [
-              /* @__PURE__ */ jsx("strong", { children: t.slotReserved }),
-              /* @__PURE__ */ jsx("br", {}),
-              t.arriveEarly
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { style: { display: "flex", justifyContent: "space-between", paddingTop: 18, borderTop: `1px solid ${T.line}` }, children: [
-            /* @__PURE__ */ jsxs("button", { onClick: () => setStep(2), style: {
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "10px 16px",
-              background: T.white,
-              border: `1px solid ${T.line}`,
-              borderRadius: 9,
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 600,
-              color: T.slate
-            }, children: [
-              /* @__PURE__ */ jsx(Icon, { name: "chevronL", size: 14, color: "currentColor" }),
-              " ",
-              t.editSlot
-            ] }),
-            /* @__PURE__ */ jsxs("button", { onClick: confirm, style: {
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "11px 22px",
-              background: T.teal,
-              color: "#fff",
-              border: "none",
-              borderRadius: 9,
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 700
-            }, children: [
-              /* @__PURE__ */ jsx(Icon, { name: "check", size: 15, color: "#fff" }),
-              " ",
-              t.confirmBooking
-            ] })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { style: { display: "grid", gap: 12 }, children: [
-        /* @__PURE__ */ jsxs("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14, padding: 18 }, children: [
-          /* @__PURE__ */ jsx("h3", { style: { fontSize: 13, fontWeight: 700, margin: "0 0 16px", color: T.ink }, children: "Booking summary" }),
-          [
-            { icon: "store", label: "SHOP", value: "Shastri Nagar FPS" },
-            { icon: "calendar", label: "DATE", value: step > 1 ? `${date}, 2026` : "Not selected" },
-            { icon: "clock", label: "TIME", value: step > 1 && time ? time : "Not selected" }
-          ].map((row, i) => /* @__PURE__ */ jsxs("div", { style: { display: "flex", gap: 9, margin: i > 0 ? "12px 0 0" : 0 }, children: [
-            /* @__PURE__ */ jsx(Icon, { name: row.icon, size: 15, color: T.teal }),
-            /* @__PURE__ */ jsxs("div", { children: [
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.5px", color: T.muted, margin: "0 0 3px" }, children: row.label }),
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 11, fontWeight: 700, color: row.value.includes("Not") ? T.muted : T.ink, margin: 0 }, children: row.value })
-            ] })
-          ] }, i)),
-          /* @__PURE__ */ jsx("div", { style: { borderTop: `1px solid ${T.line}`, marginTop: 14, paddingTop: 12 }, children: /* @__PURE__ */ jsxs("p", { style: { fontSize: 9, color: T.slate, margin: 0, display: "flex", alignItems: "center", gap: 5 }, children: [
-            /* @__PURE__ */ jsx(Icon, { name: "shield", size: 13, color: T.teal }),
-            " Secure government service"
-          ] }) })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { style: {
-          background: "#fffbeb",
-          border: `1px solid #fde68a`,
-          borderRadius: 12,
-          padding: 14,
-          display: "flex",
-          gap: 9
-        }, children: [
-          /* @__PURE__ */ jsx(Icon, { name: "help", size: 16, color: T.amber }),
-          /* @__PURE__ */ jsxs("div", { children: [
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 11, fontWeight: 700, margin: "0 0 4px", color: T.amber }, children: "Booking help" }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: "#78541a", margin: "0 0 6px", lineHeight: 1.5 }, children: "Slots can be rescheduled up to 2 hours before your visit." }),
-            /* @__PURE__ */ jsx("a", { href: "tel:1800111155", style: { fontSize: 10, fontWeight: 700, color: "#92400e" }, children: "Call 1800-111-155" })
-          ] })
-        ] })
-      ] })
-    ] })
-  ] });
+  return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1e3, margin: "0 auto" } }, /* @__PURE__ */ React.createElement(PageIntro, { title: t.bookCollection, desc: t.bookCollectionDesc, onBack: () => setView("home") }), /* @__PURE__ */ React.createElement(Stepper, { step }), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "minmax(0,1fr) 250px", gap: 18, alignItems: "start" } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14, padding: "24px 26px" } }, step === 1 && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 12, marginBottom: 22 } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 28,
+    height: 28,
+    borderRadius: 7,
+    background: T.tealLight,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: T.teal,
+    fontWeight: 800,
+    fontSize: 12,
+    flexShrink: 0
+  } }, "1"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 16, fontWeight: 700, margin: "0 0 3px", color: T.ink } }, "Choose your ration shop"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: T.muted, margin: 0 } }, "Your linked shop is selected automatically."))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 18 } }, [{ label: t.state, value: "Delhi" }, { label: t.district, value: "Central Delhi" }].map((f) => /* @__PURE__ */ React.createElement("label", { key: f.label, style: { display: "block" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: T.slate, letterSpacing: "0.5px", display: "block", marginBottom: 6 } }, f.label.toUpperCase()), /* @__PURE__ */ React.createElement("div", { style: {
+    border: `1px solid ${T.line}`,
+    borderRadius: 8,
+    padding: "9px 12px",
+    background: T.bg,
+    display: "flex",
+    alignItems: "center",
+    gap: 8
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "map", size: 14, color: T.muted }), /* @__PURE__ */ React.createElement("select", { defaultValue: f.value, style: { background: "transparent", border: "none", fontSize: 12, color: T.ink, flex: 1, outline: "none" } }, /* @__PURE__ */ React.createElement("option", null, f.value)))))), /* @__PURE__ */ React.createElement("label", null, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: T.slate, letterSpacing: "0.5px", display: "block", marginBottom: 8 } }, "RATION SHOP"), /* @__PURE__ */ React.createElement("div", { style: {
+    border: `1.5px solid ${T.teal}`,
+    borderRadius: 11,
+    padding: "14px 16px",
+    background: T.tealLight,
+    display: "flex",
+    gap: 12,
+    alignItems: "center"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    border: `2px solid ${T.teal}`,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  } }, /* @__PURE__ */ React.createElement("div", { style: { width: 4, height: 4, borderRadius: "50%", background: T.teal } })), /* @__PURE__ */ React.createElement("div", { style: {
+    width: 38,
+    height: 38,
+    borderRadius: 9,
+    background: "#d2f0ed",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "store", size: 18, color: T.teal })), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("p", { style: { fontWeight: 700, fontSize: 13, margin: "0 0 3px", color: T.tealDark } }, "Shastri Nagar Fair Price Shop"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.slate, margin: "0 0 5px" } }, "FPS ID: DL-CEN-1042"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.slate, margin: 0, display: "flex", alignItems: "center", gap: 4 } }, /* @__PURE__ */ React.createElement(Icon, { name: "map", size: 11, color: T.muted }), " 12, Main Market, Shastri Nagar \xB7 1.2 ", t.kmAway)), /* @__PURE__ */ React.createElement(Badge, { color: T.teal, bg: "#d2f0ed" }, /* @__PURE__ */ React.createElement(Icon, { name: "check", size: 10, color: T.teal }), " ", t.linkedShop))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "flex-end", marginTop: 24, paddingTop: 18, borderTop: `1px solid ${T.line}` } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setStep(2), style: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "11px 20px",
+    background: T.teal,
+    color: "#fff",
+    border: "none",
+    borderRadius: 9,
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 700
+  } }, t.continueBtn, " ", /* @__PURE__ */ React.createElement(Icon, { name: "chevronR", size: 15, color: "#fff" })))), step === 2 && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 12, marginBottom: 22 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 28, height: 28, borderRadius: 7, background: T.tealLight, display: "flex", alignItems: "center", justifyContent: "center", color: T.teal, fontWeight: 800, fontSize: 12, flexShrink: 0 } }, "2"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 16, fontWeight: 700, margin: "0 0 3px", color: T.ink } }, "Select date & time"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: T.muted, margin: 0 } }, "Slots are available for the next 5 working days."))), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, fontWeight: 700, color: T.slate, letterSpacing: "0.5px", margin: "0 0 8px" } }, "CHOOSE A DATE"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 7, marginBottom: 22 } }, DAYS.map((d) => /* @__PURE__ */ React.createElement("button", { key: d.label, onClick: () => setDate(d.label), style: {
+    padding: "10px 4px",
+    border: `1.5px solid ${date === d.label ? T.teal : T.line}`,
+    borderRadius: 9,
+    background: date === d.label ? T.tealLight : T.white,
+    cursor: "pointer",
+    textAlign: "center"
+  } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.6px", color: date === d.label ? T.teal : T.muted, margin: "0 0 4px" } }, d.day), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 18, fontWeight: 800, color: date === d.label ? T.teal : T.ink, margin: "0 0 3px" } }, d.date), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, color: date === d.label ? T.teal : T.muted, margin: 0 } }, d.note)))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, fontWeight: 700, color: T.slate, letterSpacing: "0.5px", margin: 0 } }, "AVAILABLE TIME SLOTS"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 12 } }, [{ dot: T.teal, label: "Available" }, { dot: T.amber, label: "Filling fast" }].map((l) => /* @__PURE__ */ React.createElement("span", { key: l.label, style: { display: "flex", alignItems: "center", gap: 5, fontSize: 9, color: T.muted } }, /* @__PURE__ */ React.createElement("span", { style: { width: 6, height: 6, borderRadius: "50%", background: l.dot, display: "inline-block" } }), l.label)))), errors.time && /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: T.red, background: T.redLight, borderRadius: 7, padding: "8px 12px", marginBottom: 10 } }, "\u26A0 ", errors.time), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(130px,1fr))", gap: 8, marginBottom: 20 } }, SLOTS.map((s) => {
+    const few = s.left > 0 && s.left <= 3;
+    const full = s.left === 0;
+    const sel = time === s.time;
+    return /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: s.time,
+        disabled: full,
+        onClick: () => {
+          setTime(s.time);
+          setErrors({});
+        },
+        style: {
+          border: `1.5px solid ${sel ? T.teal : few ? T.amber : T.line}`,
+          borderRadius: 9,
+          background: sel ? T.tealLight : full ? T.bg : T.white,
+          padding: "10px 10px",
+          textAlign: "left",
+          cursor: full ? "not-allowed" : "pointer",
+          opacity: full ? 0.55 : 1,
+          display: "grid",
+          gridTemplateColumns: "18px 1fr",
+          alignItems: "center",
+          gap: 6
+        }
+      },
+      /* @__PURE__ */ React.createElement(Icon, { name: "clock", size: 14, color: sel ? T.teal : T.muted }),
+      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontWeight: 700, fontSize: 11, color: sel ? T.teal : full ? T.muted : T.ink, margin: "0 0 2px", textDecoration: full ? "line-through" : "none" } }, s.time), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, color: full ? T.muted : few ? T.amber : T.slate, margin: 0 } }, full ? t.slotFull : `${s.left} ${t.slotsLeft}`))
+    );
+  })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", paddingTop: 18, borderTop: `1px solid ${T.line}` } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setStep(1), style: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 6,
+    padding: "10px 16px",
+    background: T.white,
+    border: `1px solid ${T.line}`,
+    borderRadius: 9,
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 600,
+    color: T.slate
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "chevronL", size: 14, color: "currentColor" }), " ", t.back), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    if (validateStep2()) setStep(3);
+  }, style: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "11px 20px",
+    background: T.teal,
+    color: "#fff",
+    border: "none",
+    borderRadius: 9,
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 700
+  } }, "Review booking ", /* @__PURE__ */ React.createElement(Icon, { name: "chevronR", size: 15, color: "#fff" })))), step === 3 && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 12, marginBottom: 22 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 28, height: 28, borderRadius: 7, background: T.tealLight, display: "flex", alignItems: "center", justifyContent: "center", color: T.teal, fontWeight: 800, fontSize: 12, flexShrink: 0 } }, "3"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 16, fontWeight: 700, margin: "0 0 3px", color: T.ink } }, t.reviewConfirm), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: T.muted, margin: 0 } }, t.reviewDesc))), /* @__PURE__ */ React.createElement("div", { style: { border: `1px solid ${T.line}`, borderRadius: 12, overflow: "hidden", marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.bg, padding: "14px 16px", display: "flex", gap: 12, alignItems: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 34, height: 34, borderRadius: 8, background: T.tealLight, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "store", size: 16, color: T.teal })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.5px", color: T.muted, margin: "0 0 3px" } }, "RATION SHOP"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, fontWeight: 700, margin: "0 0 2px", color: T.ink } }, "Shastri Nagar Fair Price Shop"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: 0 } }, "12, Main Market, Shastri Nagar"))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr" } }, [
+    { icon: "calendar", label: "DATE", value: `${date}, 2026` },
+    { icon: "clock", label: "TIME", value: time },
+    { icon: "user", label: "CARD HOLDER", value: "Ravi Sharma" },
+    { icon: "card", label: "RATION CARD", value: "DL \u2022\u2022\u2022\u2022 4821" }
+  ].map((row, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    display: "flex",
+    gap: 10,
+    padding: "14px 16px",
+    alignItems: "center",
+    borderTop: `1px solid ${T.line}`,
+    borderRight: i % 2 === 0 ? `1px solid ${T.line}` : "none"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: row.icon, size: 15, color: T.teal }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.5px", color: T.muted, margin: "0 0 3px" } }, row.label), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, fontWeight: 700, color: T.ink, margin: 0 } }, row.value)))))), /* @__PURE__ */ React.createElement("div", { style: {
+    background: T.blueLight,
+    border: `1px solid #bfdbfe`,
+    borderRadius: 9,
+    padding: "11px 14px",
+    display: "flex",
+    gap: 9,
+    marginBottom: 20,
+    alignItems: "flex-start"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "shield", size: 16, color: T.blue }), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: "#1e40af", margin: 0, lineHeight: 1.6 } }, /* @__PURE__ */ React.createElement("strong", null, t.slotReserved), /* @__PURE__ */ React.createElement("br", null), t.arriveEarly)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", paddingTop: 18, borderTop: `1px solid ${T.line}` } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setStep(2), style: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 6,
+    padding: "10px 16px",
+    background: T.white,
+    border: `1px solid ${T.line}`,
+    borderRadius: 9,
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 600,
+    color: T.slate
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "chevronL", size: 14, color: "currentColor" }), " ", t.editSlot), /* @__PURE__ */ React.createElement("button", { onClick: confirm, style: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "11px 22px",
+    background: T.teal,
+    color: "#fff",
+    border: "none",
+    borderRadius: 9,
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 700
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "check", size: 15, color: "#fff" }), " ", t.confirmBooking)))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14, padding: 18 } }, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: 13, fontWeight: 700, margin: "0 0 16px", color: T.ink } }, "Booking summary"), [
+    { icon: "store", label: "SHOP", value: "Shastri Nagar FPS" },
+    { icon: "calendar", label: "DATE", value: step > 1 ? `${date}, 2026` : "Not selected" },
+    { icon: "clock", label: "TIME", value: step > 1 && time ? time : "Not selected" }
+  ].map((row, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", gap: 9, margin: i > 0 ? "12px 0 0" : 0 } }, /* @__PURE__ */ React.createElement(Icon, { name: row.icon, size: 15, color: T.teal }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.5px", color: T.muted, margin: "0 0 3px" } }, row.label), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, fontWeight: 700, color: row.value.includes("Not") ? T.muted : T.ink, margin: 0 } }, row.value)))), /* @__PURE__ */ React.createElement("div", { style: { borderTop: `1px solid ${T.line}`, marginTop: 14, paddingTop: 12 } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 9, color: T.slate, margin: 0, display: "flex", alignItems: "center", gap: 5 } }, /* @__PURE__ */ React.createElement(Icon, { name: "shield", size: 13, color: T.teal }), " Secure government service"))), /* @__PURE__ */ React.createElement("div", { style: {
+    background: "#fffbeb",
+    border: `1px solid #fde68a`,
+    borderRadius: 12,
+    padding: 14,
+    display: "flex",
+    gap: 9
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "help", size: 16, color: T.amber }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, fontWeight: 700, margin: "0 0 4px", color: T.amber } }, "Booking help"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: "#78541a", margin: "0 0 6px", lineHeight: 1.5 } }, "Slots can be rescheduled up to 2 hours before your visit."), /* @__PURE__ */ React.createElement("a", { href: "tel:1800111155", style: { fontSize: 10, fontWeight: 700, color: "#92400e" } }, "Call 1800-111-155"))))));
 };
 var BookingTokenView = () => {
-  const { t, booking, setView, setBooking, showToast } = useApp();
-  if (!booking) return /* @__PURE__ */ jsxs("div", { style: { maxWidth: 600, margin: "80px auto", textAlign: "center" }, children: [
-    /* @__PURE__ */ jsx(PageIntro, { eyebrow: "MY BOOKING", title: t.myBookingTitle }),
-    /* @__PURE__ */ jsxs("div", { style: {
-      background: T.white,
-      border: `1px solid ${T.line}`,
-      borderRadius: 16,
-      padding: "48px 32px"
-    }, children: [
-      /* @__PURE__ */ jsx("div", { style: {
-        width: 64,
-        height: 64,
-        borderRadius: 16,
-        background: T.tealLight,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        margin: "0 auto 16px"
-      }, children: /* @__PURE__ */ jsx(Icon, { name: "calendar", size: 30, color: T.teal }) }),
-      /* @__PURE__ */ jsx("h2", { style: { fontSize: 18, fontWeight: 700, color: T.ink, margin: "0 0 8px" }, children: t.noBooking }),
-      /* @__PURE__ */ jsx("p", { style: { fontSize: 13, color: T.slate, margin: "0 0 24px" }, children: t.noBookingDesc }),
-      /* @__PURE__ */ jsxs("button", { onClick: () => setView("book"), style: {
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 8,
-        padding: "12px 22px",
-        background: T.teal,
-        color: "#fff",
-        border: "none",
-        borderRadius: 9,
-        cursor: "pointer",
-        fontSize: 13,
-        fontWeight: 700
-      }, children: [
-        t.bookSlot,
-        " ",
-        /* @__PURE__ */ jsx(Icon, { name: "chevronR", size: 16, color: "#fff" })
-      ] })
-    ] })
-  ] });
-  return /* @__PURE__ */ jsxs("div", { style: { maxWidth: 900, margin: "0 auto" }, children: [
-    /* @__PURE__ */ jsx(PageIntro, { eyebrow: "MY BOOKING", title: t.myBookingTitle, desc: t.showQR }),
-    /* @__PURE__ */ jsxs("div", { style: { display: "grid", gridTemplateColumns: "1fr 260px", gap: 20, alignItems: "start" }, children: [
-      /* @__PURE__ */ jsxs("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 16, overflow: "hidden" }, children: [
-        /* @__PURE__ */ jsxs("div", { style: {
-          background: T.teal,
-          padding: "16px 22px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center"
-        }, children: [
-          /* @__PURE__ */ jsx(Brand, {}),
-          /* @__PURE__ */ jsxs(Badge, { color: "#fff", bg: "rgba(255,255,255,0.2)", children: [
-            /* @__PURE__ */ jsx(Icon, { name: "checkCircle", size: 11, color: "#fff" }),
-            " ",
-            t.confirmed
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { style: { display: "grid", gridTemplateColumns: "200px 1fr", minHeight: 240 }, children: [
-          /* @__PURE__ */ jsxs("div", { style: {
-            borderRight: `1.5px dashed ${T.line}`,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 24,
-            gap: 10
-          }, children: [
-            /* @__PURE__ */ jsx("div", { style: {
-              width: 130,
-              height: 130,
-              border: `2px solid ${T.ink}`,
-              borderRadius: 8,
-              padding: 6,
-              background: T.white,
-              display: "grid",
-              gridTemplateColumns: "repeat(7,1fr)",
-              gap: 1.5
-            }, children: Array.from({ length: 49 }).map((_, i) => {
-              const row = Math.floor(i / 7), col = i % 7;
-              const corner = row < 3 && col < 3 || row < 3 && col > 3 || row > 3 && col < 3;
-              const edge = corner && (row === 0 || row === 2 || col === 0 || col === 2);
-              const inner = corner && row === 1 && col === 1;
-              const filled = edge || inner || Math.random() > 0.6;
-              return /* @__PURE__ */ jsx("div", { style: { background: filled ? T.ink : "transparent", borderRadius: 1 } }, i);
-            }) }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 9, color: T.muted, margin: 0, textAlign: "center" }, children: "Scan at the ration shop" })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { style: { padding: "22px 24px" }, children: [
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "1px", color: T.muted, margin: "0 0 4px" }, children: t.bookingId }),
-            /* @__PURE__ */ jsx("h2", { style: { fontSize: 22, fontWeight: 800, letterSpacing: "-0.5px", color: T.ink, margin: "0 0 16px" }, children: booking.id }),
-            /* @__PURE__ */ jsxs("div", { style: { borderTop: `1px solid ${T.line}`, paddingTop: 14 }, children: [
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.8px", color: T.muted, margin: "0 0 4px" }, children: "RATION SHOP" }),
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 13, fontWeight: 700, margin: "0 0 3px", color: T.ink }, children: booking.shop }),
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.muted, margin: "0 0 14px" }, children: "12, Main Market, Shastri Nagar" }),
-              /* @__PURE__ */ jsx("div", { style: { display: "flex", gap: 20 }, children: [{ label: "DATE", val: `${booking.date}, 2026` }, { label: "TIME", val: booking.time }].map((r) => /* @__PURE__ */ jsxs("div", { children: [
-                /* @__PURE__ */ jsx("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.8px", color: T.muted, margin: "0 0 4px" }, children: r.label }),
-                /* @__PURE__ */ jsx("p", { style: { fontSize: 12, fontWeight: 700, color: T.ink, margin: 0 }, children: r.val })
-              ] }, r.label)) })
-            ] })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { style: {
-          background: T.tealLight,
-          padding: "11px 22px",
-          display: "flex",
-          alignItems: "center",
-          gap: 8
-        }, children: [
-          /* @__PURE__ */ jsx(Icon, { name: "shield", size: 14, color: T.teal }),
-          /* @__PURE__ */ jsx("span", { style: { fontSize: 10, color: T.teal, fontWeight: 600 }, children: t.verifiedToken })
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { style: { display: "grid", gap: 14 }, children: [
-        /* @__PURE__ */ jsxs("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14, padding: 18 }, children: [
-          /* @__PURE__ */ jsx("h3", { style: { fontSize: 13, fontWeight: 700, margin: "0 0 14px", color: T.ink }, children: "Booking actions" }),
-          [
-            { icon: "download", label: t.downloadToken, action: () => showToast({ message: "Token downloaded", type: "success" }) },
-            { icon: "refresh", label: t.reschedule, action: () => setView("book") }
-          ].map((a, i) => /* @__PURE__ */ jsxs("button", { onClick: a.action, style: {
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: "11px 14px",
-            background: T.bg,
-            border: `1px solid ${T.line}`,
-            borderRadius: 9,
-            cursor: "pointer",
-            fontSize: 12,
-            fontWeight: 600,
-            color: T.ink,
-            marginBottom: 8,
-            textAlign: "left"
-          }, children: [
-            /* @__PURE__ */ jsx(Icon, { name: a.icon, size: 15, color: T.teal }),
-            " ",
-            a.label
-          ] }, i)),
-          /* @__PURE__ */ jsxs("button", { onClick: () => {
-            setBooking(null);
-            showToast({ message: "Booking cancelled", type: "info" });
-          }, style: {
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: "11px 14px",
-            background: "#fff1f1",
-            border: `1px solid #fecaca`,
-            borderRadius: 9,
-            cursor: "pointer",
-            fontSize: 12,
-            fontWeight: 600,
-            color: T.red,
-            textAlign: "left"
-          }, children: [
-            /* @__PURE__ */ jsx(Icon, { name: "x", size: 15, color: T.red }),
-            " ",
-            t.cancelBooking
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { style: {
-          background: T.white,
-          border: `1px solid ${T.line}`,
-          borderRadius: 12,
-          padding: "14px 16px",
-          display: "flex",
-          gap: 12,
-          alignItems: "flex-start"
-        }, children: [
-          /* @__PURE__ */ jsx(Icon, { name: "clock", size: 18, color: T.teal }),
-          /* @__PURE__ */ jsxs("div", { children: [
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 12, fontWeight: 700, margin: "0 0 4px", color: T.ink }, children: t.arriveNote }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.slate, margin: 0, lineHeight: 1.5 }, children: t.slotHeld })
-          ] })
-        ] })
-      ] })
-    ] })
-  ] });
+  const { t, booking, setView, setBooking, showToast: showToast2 } = useApp();
+  if (!booking) return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 600, margin: "80px auto", textAlign: "center" } }, /* @__PURE__ */ React.createElement(PageIntro, { eyebrow: "MY BOOKING", title: t.myBookingTitle }), /* @__PURE__ */ React.createElement("div", { style: {
+    background: T.white,
+    border: `1px solid ${T.line}`,
+    borderRadius: 16,
+    padding: "48px 32px"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
+    background: T.tealLight,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "0 auto 16px"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "calendar", size: 30, color: T.teal })), /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 18, fontWeight: 700, color: T.ink, margin: "0 0 8px" } }, t.noBooking), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, color: T.slate, margin: "0 0 24px" } }, t.noBookingDesc), /* @__PURE__ */ React.createElement("button", { onClick: () => setView("book"), style: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "12px 22px",
+    background: T.teal,
+    color: "#fff",
+    border: "none",
+    borderRadius: 9,
+    cursor: "pointer",
+    fontSize: 13,
+    fontWeight: 700
+  } }, t.bookSlot, " ", /* @__PURE__ */ React.createElement(Icon, { name: "chevronR", size: 16, color: "#fff" }))));
+  return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 900, margin: "0 auto" } }, /* @__PURE__ */ React.createElement(PageIntro, { eyebrow: "MY BOOKING", title: t.myBookingTitle, desc: t.showQR }), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 260px", gap: 20, alignItems: "start" } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 16, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: {
+    background: T.teal,
+    padding: "16px 22px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
+  } }, /* @__PURE__ */ React.createElement(Brand, null), /* @__PURE__ */ React.createElement(Badge, { color: "#fff", bg: "rgba(255,255,255,0.2)" }, /* @__PURE__ */ React.createElement(Icon, { name: "checkCircle", size: 11, color: "#fff" }), " ", t.confirmed)), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "200px 1fr", minHeight: 240 } }, /* @__PURE__ */ React.createElement("div", { style: {
+    borderRight: `1.5px dashed ${T.line}`,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+    gap: 10
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 130,
+    height: 130,
+    border: `2px solid ${T.ink}`,
+    borderRadius: 8,
+    padding: 6,
+    background: T.white,
+    display: "grid",
+    gridTemplateColumns: "repeat(7,1fr)",
+    gap: 1.5
+  } }, Array.from({ length: 49 }).map((_, i) => {
+    const row = Math.floor(i / 7), col = i % 7;
+    const corner = row < 3 && col < 3 || row < 3 && col > 3 || row > 3 && col < 3;
+    const edge = corner && (row === 0 || row === 2 || col === 0 || col === 2);
+    const inner = corner && row === 1 && col === 1;
+    const filled = edge || inner || Math.random() > 0.6;
+    return /* @__PURE__ */ React.createElement("div", { key: i, style: { background: filled ? T.ink : "transparent", borderRadius: 1 } });
+  })), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 9, color: T.muted, margin: 0, textAlign: "center" } }, "Scan at the ration shop")), /* @__PURE__ */ React.createElement("div", { style: { padding: "22px 24px" } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "1px", color: T.muted, margin: "0 0 4px" } }, t.bookingId), /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 22, fontWeight: 800, letterSpacing: "-0.5px", color: T.ink, margin: "0 0 16px" } }, booking.id), /* @__PURE__ */ React.createElement("div", { style: { borderTop: `1px solid ${T.line}`, paddingTop: 14 } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.8px", color: T.muted, margin: "0 0 4px" } }, "RATION SHOP"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, fontWeight: 700, margin: "0 0 3px", color: T.ink } }, booking.shop), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: "0 0 14px" } }, "12, Main Market, Shastri Nagar"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 20 } }, [{ label: "DATE", val: `${booking.date}, 2026` }, { label: "TIME", val: booking.time }].map((r) => /* @__PURE__ */ React.createElement("div", { key: r.label }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.8px", color: T.muted, margin: "0 0 4px" } }, r.label), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, fontWeight: 700, color: T.ink, margin: 0 } }, r.val))))))), /* @__PURE__ */ React.createElement("div", { style: {
+    background: T.tealLight,
+    padding: "11px 22px",
+    display: "flex",
+    alignItems: "center",
+    gap: 8
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "shield", size: 14, color: T.teal }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, color: T.teal, fontWeight: 600 } }, t.verifiedToken))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14, padding: 18 } }, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: 13, fontWeight: 700, margin: "0 0 14px", color: T.ink } }, "Booking actions"), [
+    { icon: "download", label: t.downloadToken, action: () => showToast2({ message: "Token downloaded", type: "success" }) },
+    { icon: "refresh", label: t.reschedule, action: () => setView("book") }
+  ].map((a, i) => /* @__PURE__ */ React.createElement("button", { key: i, onClick: a.action, style: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    padding: "11px 14px",
+    background: T.bg,
+    border: `1px solid ${T.line}`,
+    borderRadius: 9,
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 600,
+    color: T.ink,
+    marginBottom: 8,
+    textAlign: "left"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: a.icon, size: 15, color: T.teal }), " ", a.label)), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    setBooking(null);
+    showToast2({ message: "Booking cancelled", type: "info" });
+  }, style: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    padding: "11px 14px",
+    background: "#fff1f1",
+    border: `1px solid #fecaca`,
+    borderRadius: 9,
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 600,
+    color: T.red,
+    textAlign: "left"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "x", size: 15, color: T.red }), " ", t.cancelBooking)), /* @__PURE__ */ React.createElement("div", { style: {
+    background: T.white,
+    border: `1px solid ${T.line}`,
+    borderRadius: 12,
+    padding: "14px 16px",
+    display: "flex",
+    gap: 12,
+    alignItems: "flex-start"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "clock", size: 18, color: T.teal }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, fontWeight: 700, margin: "0 0 4px", color: T.ink } }, t.arriveNote), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.slate, margin: 0, lineHeight: 1.5 } }, t.slotHeld))))));
 };
 var NotificationsView = () => {
   const { t, setNotifCount } = useApp();
@@ -2245,396 +1815,329 @@ var NotificationsView = () => {
     setItems(items.map((n) => ({ ...n, unread: false })));
     setNotifCount(0);
   };
-  return /* @__PURE__ */ jsxs("div", { style: { maxWidth: 700, margin: "0 auto" }, children: [
-    /* @__PURE__ */ jsx(PageIntro, { eyebrow: "UPDATES", title: t.updatesTitle, desc: t.updatesDesc }),
-    /* @__PURE__ */ jsxs("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14 }, children: [
-      /* @__PURE__ */ jsxs("div", { style: {
-        display: "flex",
-        alignItems: "center",
-        padding: "14px 18px",
-        borderBottom: `1px solid ${T.line}`,
-        gap: 8,
-        flexWrap: "wrap"
-      }, children: [
-        ["all", "unread"].map((f) => /* @__PURE__ */ jsx("button", { onClick: () => setFilter(f), style: {
-          padding: "6px 12px",
-          borderRadius: 20,
-          border: "none",
-          cursor: "pointer",
-          fontSize: 11,
-          fontWeight: 700,
-          background: filter === f ? T.teal : T.bg,
-          color: filter === f ? "#fff" : T.slate
-        }, children: f === "all" ? `${t.all} ${items.length}` : `${t.unread} ${items.filter((n) => n.unread).length}` }, f)),
-        /* @__PURE__ */ jsxs("button", { onClick: markAllRead, style: {
-          marginLeft: "auto",
-          display: "flex",
-          alignItems: "center",
-          gap: 5,
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          color: T.teal,
-          fontSize: 11,
-          fontWeight: 700
-        }, children: [
-          /* @__PURE__ */ jsx(Icon, { name: "check", size: 14, color: "currentColor" }),
-          " ",
-          t.markAllRead
-        ] })
-      ] }),
-      filtered.map((n, i) => /* @__PURE__ */ jsxs("div", { style: {
-        display: "flex",
-        gap: 13,
-        padding: "16px 20px",
-        position: "relative",
-        borderBottom: i < filtered.length - 1 ? `1px solid ${T.line}` : "none",
-        background: n.unread ? "#fafcff" : T.white
-      }, children: [
-        /* @__PURE__ */ jsx("div", { style: {
-          width: 38,
-          height: 38,
-          borderRadius: 10,
-          flexShrink: 0,
-          fontSize: 18,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: n.type === "success" ? T.greenLight : n.type === "info" ? T.blueLight : T.amberLight
-        }, children: n.icon }),
-        /* @__PURE__ */ jsxs("div", { style: { flex: 1 }, children: [
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 13, fontWeight: 700, margin: "0 0 4px", color: T.ink }, children: n.title }),
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 11, color: T.slate, margin: "0 0 5px" }, children: n.msg }),
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.muted, margin: 0 }, children: n.time })
-        ] }),
-        n.unread && /* @__PURE__ */ jsx("span", { style: {
-          position: "absolute",
-          right: 18,
-          top: 20,
-          width: 7,
-          height: 7,
-          borderRadius: "50%",
-          background: T.blue
-        }, "aria-label": "Unread" })
-      ] }, i))
-    ] })
-  ] });
+  return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 700, margin: "0 auto" } }, /* @__PURE__ */ React.createElement(PageIntro, { eyebrow: "UPDATES", title: t.updatesTitle, desc: t.updatesDesc }), /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14 } }, /* @__PURE__ */ React.createElement("div", { style: {
+    display: "flex",
+    alignItems: "center",
+    padding: "14px 18px",
+    borderBottom: `1px solid ${T.line}`,
+    gap: 8,
+    flexWrap: "wrap"
+  } }, ["all", "unread"].map((f) => /* @__PURE__ */ React.createElement("button", { key: f, onClick: () => setFilter(f), style: {
+    padding: "6px 12px",
+    borderRadius: 20,
+    border: "none",
+    cursor: "pointer",
+    fontSize: 11,
+    fontWeight: 700,
+    background: filter === f ? T.teal : T.bg,
+    color: filter === f ? "#fff" : T.slate
+  } }, f === "all" ? `${t.all} ${items.length}` : `${t.unread} ${items.filter((n) => n.unread).length}`)), /* @__PURE__ */ React.createElement("button", { onClick: markAllRead, style: {
+    marginLeft: "auto",
+    display: "flex",
+    alignItems: "center",
+    gap: 5,
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    color: T.teal,
+    fontSize: 11,
+    fontWeight: 700
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "check", size: 14, color: "currentColor" }), " ", t.markAllRead)), filtered.map((n, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    display: "flex",
+    gap: 13,
+    padding: "16px 20px",
+    position: "relative",
+    borderBottom: i < filtered.length - 1 ? `1px solid ${T.line}` : "none",
+    background: n.unread ? "#fafcff" : T.white
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    flexShrink: 0,
+    fontSize: 18,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: n.type === "success" ? T.greenLight : n.type === "info" ? T.blueLight : T.amberLight
+  } }, n.icon), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, fontWeight: 700, margin: "0 0 4px", color: T.ink } }, n.title), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: T.slate, margin: "0 0 5px" } }, n.msg), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: 0 } }, n.time)), n.unread && /* @__PURE__ */ React.createElement("span", { style: {
+    position: "absolute",
+    right: 18,
+    top: 20,
+    width: 7,
+    height: 7,
+    borderRadius: "50%",
+    background: T.blue
+  }, "aria-label": "Unread" })))));
 };
 var ProfileView = () => {
   const { t, lang, setLang } = useApp();
-  return /* @__PURE__ */ jsxs("div", { style: { maxWidth: 900, margin: "0 auto" }, children: [
-    /* @__PURE__ */ jsx(PageIntro, { eyebrow: "ACCOUNT", title: t.accountTitle, desc: t.accountDesc }),
-    /* @__PURE__ */ jsxs("div", { style: { display: "grid", gridTemplateColumns: "1fr 320px", gap: 18, alignItems: "start" }, children: [
-      /* @__PURE__ */ jsxs("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14 }, children: [
-        /* @__PURE__ */ jsxs("div", { style: {
-          display: "flex",
-          gap: 16,
-          alignItems: "center",
-          padding: "22px 24px",
-          borderBottom: `1px solid ${T.line}`
-        }, children: [
-          /* @__PURE__ */ jsx(Avatar, { initials: "RS", size: 60 }),
-          /* @__PURE__ */ jsxs("div", { style: { flex: 1 }, children: [
-            /* @__PURE__ */ jsx("h2", { style: { fontSize: 18, fontWeight: 800, margin: "0 0 4px", color: T.ink }, children: "Ravi Sharma" }),
-            /* @__PURE__ */ jsxs(Badge, { color: T.teal, bg: T.tealLight, children: [
-              /* @__PURE__ */ jsx(Icon, { name: "shield", size: 11, color: T.teal }),
-              " ",
-              t.verifiedHolder
-            ] })
-          ] }),
-          /* @__PURE__ */ jsx("button", { style: {
-            padding: "8px 14px",
-            background: T.bg,
-            border: `1px solid ${T.line}`,
-            borderRadius: 8,
-            cursor: "pointer",
-            fontSize: 11,
-            fontWeight: 600,
-            color: T.slate
-          }, children: t.editProfile })
-        ] }),
-        /* @__PURE__ */ jsx("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr" }, children: [
-          { icon: "phone", label: t.mobile, value: "+91 98\u2022\u2022\u2022 \u2022\u2022210" },
-          { icon: "card", label: "Ration card", value: "DL-CEN-2019-4821" },
-          { icon: "map", label: t.address, value: "24-B, Shastri Nagar, New Delhi" },
-          { icon: "globe", label: t.language, value: lang === "en" ? t.english : t.hindi }
-        ].map((row, i) => /* @__PURE__ */ jsxs("div", { style: {
-          display: "flex",
-          gap: 12,
-          padding: "16px 24px",
-          alignItems: "center",
-          borderTop: `1px solid ${T.line}`,
-          borderRight: i % 2 === 0 ? `1px solid ${T.line}` : "none"
-        }, children: [
-          /* @__PURE__ */ jsx(Icon, { name: row.icon, size: 16, color: T.teal }),
-          /* @__PURE__ */ jsxs("div", { children: [
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.6px", color: T.muted, margin: "0 0 4px" }, children: row.label.toUpperCase() }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 12, fontWeight: 700, color: T.ink, margin: 0 }, children: row.value })
-          ] })
-        ] }, i)) })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { style: { display: "grid", gap: 14 }, children: [
-        /* @__PURE__ */ jsxs("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14, padding: 18 }, children: [
-          /* @__PURE__ */ jsx("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 14 }, children: /* @__PURE__ */ jsxs("div", { children: [
-            /* @__PURE__ */ jsx("h3", { style: { fontSize: 14, fontWeight: 700, margin: 0, color: T.ink }, children: t.familyCard }),
-            /* @__PURE__ */ jsxs("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" }, children: [
-              "4 ",
-              t.membersLinked
-            ] })
-          ] }) }),
-          [["RS", "Ravi Sharma", t.familyHead], ["SS", "Sunita Sharma", t.spouse], ["AS", "Aarav Sharma", t.son], ["MS", "Meera Sharma", t.daughter]].map((m) => /* @__PURE__ */ jsxs("div", { style: {
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: "10px 0",
-            borderBottom: `1px solid ${T.line}`
-          }, children: [
-            /* @__PURE__ */ jsx(Avatar, { initials: m[0], size: 32 }),
-            /* @__PURE__ */ jsxs("div", { style: { flex: 1 }, children: [
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 12, fontWeight: 700, margin: 0, color: T.ink }, children: m[1] }),
-              /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.muted, margin: "2px 0 0" }, children: m[2] })
-            ] }),
-            /* @__PURE__ */ jsx(Icon, { name: "shield", size: 14, color: T.teal })
-          ] }, m[0]))
-        ] }),
-        /* @__PURE__ */ jsx("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14, overflow: "hidden" }, children: [
-          { icon: "help", label: t.helpSupportBtn, action: () => {
-          } },
-          { icon: "globe", label: t.languageBtn, action: () => {
-          } },
-          { icon: "logout", label: t.logout, color: T.red, action: () => {
-          } }
-        ].map((item, i) => item.icon === "globe" ? /* @__PURE__ */ jsxs("div", { style: {
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          padding: "14px 18px",
-          background: "transparent",
-          borderBottom: i < 2 ? `1px solid ${T.line}` : "none",
-          color: item.color || T.slate,
-          fontSize: 13,
-          fontWeight: 600
-        }, children: [
-          /* @__PURE__ */ jsx(Icon, { name: item.icon, size: 16, color: item.color || T.slate }),
-          /* @__PURE__ */ jsx("span", { style: { flex: 1 }, children: item.label }),
-          /* @__PURE__ */ jsxs("div", { style: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 }, children: [
-            /* @__PURE__ */ jsxs("span", { style: { fontSize: 10, color: T.muted }, children: [
-              LANG_OPTIONS.length,
-              " available"
-            ] }),
-            /* @__PURE__ */ jsx(
-              "select",
-              {
-                value: lang,
-                onChange: (e) => setLang(e.target.value),
-                "aria-label": "Switch language",
-                style: {
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: T.ink,
-                  background: T.bg,
-                  border: `1px solid ${T.line}`,
-                  borderRadius: 7,
-                  padding: "6px 10px",
-                  cursor: "pointer"
-                },
-                children: LANG_OPTIONS.map((option) => /* @__PURE__ */ jsx("option", { value: option.code, children: option.label }, option.code))
-              }
-            )
-          ] })
-        ] }, i) : /* @__PURE__ */ jsxs("button", { onClick: item.action, style: {
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          padding: "14px 18px",
-          background: "transparent",
-          border: "none",
-          borderBottom: i < 2 ? `1px solid ${T.line}` : "none",
-          cursor: "pointer",
-          color: item.color || T.slate,
-          fontSize: 13,
-          fontWeight: 600,
-          textAlign: "left"
-        }, children: [
-          /* @__PURE__ */ jsx(Icon, { name: item.icon, size: 16, color: item.color || T.slate }),
-          /* @__PURE__ */ jsx("span", { style: { flex: 1 }, children: item.label }),
-          /* @__PURE__ */ jsx(Icon, { name: "chevronR", size: 15, color: item.color || T.muted })
-        ] }, i)) })
-      ] })
-    ] })
-  ] });
+  return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 900, margin: "0 auto" } }, /* @__PURE__ */ React.createElement(PageIntro, { eyebrow: "ACCOUNT", title: t.accountTitle, desc: t.accountDesc }), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 320px", gap: 18, alignItems: "start" } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14 } }, /* @__PURE__ */ React.createElement("div", { style: {
+    display: "flex",
+    gap: 16,
+    alignItems: "center",
+    padding: "22px 24px",
+    borderBottom: `1px solid ${T.line}`
+  } }, /* @__PURE__ */ React.createElement(Avatar, { initials: "RS", size: 60 }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 18, fontWeight: 800, margin: "0 0 4px", color: T.ink } }, "Ravi Sharma"), /* @__PURE__ */ React.createElement(Badge, { color: T.teal, bg: T.tealLight }, /* @__PURE__ */ React.createElement(Icon, { name: "shield", size: 11, color: T.teal }), " ", t.verifiedHolder)), /* @__PURE__ */ React.createElement("button", { style: {
+    padding: "8px 14px",
+    background: T.bg,
+    border: `1px solid ${T.line}`,
+    borderRadius: 8,
+    cursor: "pointer",
+    fontSize: 11,
+    fontWeight: 600,
+    color: T.slate
+  } }, t.editProfile)), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr" } }, [
+    { icon: "phone", label: t.mobile, value: "+91 98\u2022\u2022\u2022 \u2022\u2022210" },
+    { icon: "card", label: "Ration card", value: "DL-CEN-2019-4821" },
+    { icon: "map", label: t.address, value: "24-B, Shastri Nagar, New Delhi" },
+    { icon: "globe", label: t.language, value: lang === "en" ? t.english : t.hindi }
+  ].map((row, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    display: "flex",
+    gap: 12,
+    padding: "16px 24px",
+    alignItems: "center",
+    borderTop: `1px solid ${T.line}`,
+    borderRight: i % 2 === 0 ? `1px solid ${T.line}` : "none"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: row.icon, size: 16, color: T.teal }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.6px", color: T.muted, margin: "0 0 4px" } }, row.label.toUpperCase()), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, fontWeight: 700, color: T.ink, margin: 0 } }, row.value)))))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14, padding: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: 14, fontWeight: 700, margin: 0, color: T.ink } }, t.familyCard), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" } }, "4 ", t.membersLinked))), [["RS", "Ravi Sharma", t.familyHead], ["SS", "Sunita Sharma", t.spouse], ["AS", "Aarav Sharma", t.son], ["MS", "Meera Sharma", t.daughter]].map((m) => /* @__PURE__ */ React.createElement("div", { key: m[0], style: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    padding: "10px 0",
+    borderBottom: `1px solid ${T.line}`
+  } }, /* @__PURE__ */ React.createElement(Avatar, { initials: m[0], size: 32 }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, fontWeight: 700, margin: 0, color: T.ink } }, m[1]), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: "2px 0 0" } }, m[2])), /* @__PURE__ */ React.createElement(Icon, { name: "shield", size: 14, color: T.teal })))), /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14, overflow: "hidden" } }, [
+    { icon: "help", label: t.helpSupportBtn, action: () => showToast({ message: "Helpline number copied", type: "info" }) },
+    { icon: "globe", label: t.languageBtn, action: () => {
+    } },
+    { icon: "logout", label: t.logout, color: T.red, action: logout }
+  ].map((item, i) => item.icon === "globe" ? /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    padding: "14px 18px",
+    background: "transparent",
+    borderBottom: i < 2 ? `1px solid ${T.line}` : "none",
+    color: item.color || T.slate,
+    fontSize: 13,
+    fontWeight: 600
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: item.icon, size: 16, color: item.color || T.slate }), /* @__PURE__ */ React.createElement("span", { style: { flex: 1 } }, item.label), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, color: T.muted } }, LANG_OPTIONS.length, " available"), /* @__PURE__ */ React.createElement(
+    "select",
+    {
+      value: lang,
+      onChange: (e) => setLang(e.target.value),
+      "aria-label": "Switch language",
+      style: {
+        fontSize: 12,
+        fontWeight: 600,
+        color: T.ink,
+        background: T.bg,
+        border: `1px solid ${T.line}`,
+        borderRadius: 7,
+        padding: "6px 10px",
+        cursor: "pointer"
+      }
+    },
+    LANG_OPTIONS.map((option) => /* @__PURE__ */ React.createElement("option", { key: option.code, value: option.code }, option.label))
+  ))) : /* @__PURE__ */ React.createElement("button", { key: i, onClick: item.action, style: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    padding: "14px 18px",
+    background: "transparent",
+    border: "none",
+    borderBottom: i < 2 ? `1px solid ${T.line}` : "none",
+    cursor: "pointer",
+    color: item.color || T.slate,
+    fontSize: 13,
+    fontWeight: 600,
+    textAlign: "left"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: item.icon, size: 16, color: item.color || T.slate }), /* @__PURE__ */ React.createElement("span", { style: { flex: 1 } }, item.label), /* @__PURE__ */ React.createElement(Icon, { name: "chevronR", size: 15, color: item.color || T.muted })))))));
+};
+var LoginView = ({ onLogin, authError }) => {
+  const { lang, setLang } = useApp();
+  const [roleSelection, setRoleSelection] = useState("citizen");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const roleCards = [
+    { role: "citizen", icon: "user", title: "Citizen", subtitle: "Book slots & collect rations" },
+    { role: "shopkeeper", icon: "store", title: "Shopkeeper", subtitle: "Verify digital tokens" },
+    { role: "admin", icon: "shield", title: "Administrator", subtitle: "Monitor allocation & reports" }
+  ];
+  const demoUsers = [
+    { role: "citizen", label: "Citizen", password: "citizen123" },
+    { role: "shopkeeper", label: "Shopkeeper", password: "shopkeeper123" },
+    { role: "admin", label: "Administrator", password: "admin123" }
+  ];
+  const features = [
+    "Book Slots",
+    "Digital Token",
+    "QR Verification",
+    "Family Management",
+    "Notifications",
+    "AI Assistant"
+  ];
+  const handleFill = (role, passwordValue) => {
+    setRoleSelection(role);
+    setPassword(passwordValue);
+  };
+  return /* @__PURE__ */ React.createElement("div", { className: "login-page", style: { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "28px 20px", background: "linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%)" } }, /* @__PURE__ */ React.createElement("div", { className: "login-grid", style: { width: "100%", maxWidth: 1180, display: "grid", gridTemplateColumns: "minmax(320px, 1fr) minmax(360px, 450px)", gap: 28, alignItems: "stretch" } }, /* @__PURE__ */ React.createElement("div", { className: "login-left", style: { position: "relative", overflow: "hidden", borderRadius: 32, background: "rgba(255,255,255,0.92)", border: "1px solid rgba(255,255,255,0.72)", boxShadow: "0 28px 90px rgba(15,23,42,0.08)", padding: "42px 34px" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: -40, left: -40, width: 140, height: 140, borderRadius: "50%", background: "rgba(20,148,142,0.12)" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", bottom: -30, right: -30, width: 100, height: 100, borderRadius: "50%", background: "rgba(29,78,216,0.1)" } }), /* @__PURE__ */ React.createElement("div", { className: "login-left-inner", style: { position: "relative", zIndex: 1, display: "grid", gap: 22 } }, /* @__PURE__ */ React.createElement("div", { className: "login-gov", style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, fontSize: 13, fontWeight: 700, color: T.teal } }, /* @__PURE__ */ React.createElement("span", null, "\u{1F1EE}\u{1F1F3}"), /* @__PURE__ */ React.createElement("span", null, "Government of India")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: T.slate } }, /* @__PURE__ */ React.createElement("span", null, "\u{1F310} ", getLangLabel(lang)), /* @__PURE__ */ React.createElement("select", { value: lang, onChange: (e) => setLang(e.target.value), "aria-label": "Select language", style: { padding: "8px 10px", borderRadius: 10, border: `1px solid ${T.line}`, background: T.white, color: T.ink, fontSize: 12, cursor: "pointer" } }, LANG_OPTIONS.map((option) => /* @__PURE__ */ React.createElement("option", { key: option.code, value: option.code }, option.label))))), /* @__PURE__ */ React.createElement("div", { className: "login-hero", style: { display: "flex", alignItems: "center", gap: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 72, height: 72, borderRadius: 20, background: T.tealLight, display: "grid", placeItems: "center" } }, /* @__PURE__ */ React.createElement("img", { src: "./smart-ration.png", alt: "Smart Ration logo", style: { width: 44, height: 44, objectFit: "cover" } })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontSize: 13, fontWeight: 700, color: T.teal } }, "Verified Government Service \u2713"), /* @__PURE__ */ React.createElement("h1", { style: { margin: "8px 0 8px", fontSize: 34, fontWeight: 800, color: T.ink, lineHeight: 1.05 } }, "Smart Ration"), /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontSize: 15, color: T.slate, maxWidth: 340 } }, "India's Digital Public Distribution System for secure ration booking, QR verification, and real-time stock monitoring."))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 12, paddingTop: 6 } }, features.map((feature) => /* @__PURE__ */ React.createElement("div", { key: feature, style: { display: "flex", alignItems: "center", gap: 10, color: T.slate, fontSize: 13 } }, /* @__PURE__ */ React.createElement("span", { style: { width: 28, height: 28, borderRadius: 10, background: T.tealLight, color: T.teal, display: "grid", placeItems: "center", fontSize: 14, fontWeight: 700 } }, "\u2713"), feature)))), /* @__PURE__ */ React.createElement("div", { style: { position: "relative", zIndex: 1, marginTop: 38, borderTop: `1px solid ${T.line}`, paddingTop: 22, display: "flex", flexWrap: "wrap", gap: 14, fontSize: 12, color: T.slate } }, /* @__PURE__ */ React.createElement("span", null, "Privacy"), /* @__PURE__ */ React.createElement("span", null, "Terms"), /* @__PURE__ */ React.createElement("span", null, "Help"), /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", fontWeight: 700, color: T.ink } }, "Version 2.0"))), /* @__PURE__ */ React.createElement("div", { className: "login-right", style: { borderRadius: 28, background: "rgba(255,255,255,0.94)", border: "1px solid rgba(255,255,255,0.82)", boxShadow: "0 20px 60px rgba(15,23,42,0.12)", backdropFilter: "blur(18px)", padding: "36px 34px", display: "grid", gap: 24 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 12 } }, /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontSize: 12, fontWeight: 700, color: T.teal, textTransform: "uppercase", letterSpacing: "0.18em" } }, "Welcome Back"), /* @__PURE__ */ React.createElement("h2", { style: { margin: "10px 0 8px", fontSize: 28, fontWeight: 800, color: T.ink, lineHeight: 1.05 } }, "Sign in to access your digital ration services."), /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontSize: 14, color: T.slate } }, "Secure access for citizens, shopkeepers and administrators.")), authError && /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px", borderRadius: 16, background: T.redLight, color: T.red, fontSize: 13, fontWeight: 600 } }, authError), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 12 } }, roleCards.map((card) => {
+    const selected = card.role === roleSelection;
+    return /* @__PURE__ */ React.createElement("button", { key: card.role, type: "button", onClick: () => setRoleSelection(card.role), style: {
+      display: "grid",
+      gridTemplateColumns: "auto 1fr",
+      gap: 14,
+      alignItems: "center",
+      width: "100%",
+      padding: "16px 18px",
+      borderRadius: 18,
+      border: selected ? `1px solid ${T.teal}` : `1px solid ${T.line}`,
+      background: selected ? "rgba(20,148,142,0.08)" : T.white,
+      cursor: "pointer",
+      textAlign: "left",
+      boxShadow: selected ? "0 16px 35px rgba(15,23,42,0.08)" : "none"
+    } }, /* @__PURE__ */ React.createElement("div", { style: { width: 42, height: 42, borderRadius: 14, background: selected ? T.teal : T.bg, display: "grid", placeItems: "center", color: selected ? "#fff" : T.teal } }, /* @__PURE__ */ React.createElement(Icon, { name: card.icon, size: 20, color: selected ? "#fff" : T.teal })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontSize: 14, fontWeight: 700, color: T.ink } }, card.title), /* @__PURE__ */ React.createElement("p", { style: { margin: "6px 0 0", fontSize: 12, color: T.slate } }, card.subtitle)));
+  })), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 18 } }, /* @__PURE__ */ React.createElement("label", { style: { display: "grid", gap: 10, fontSize: 13, color: T.slate } }, "Password", /* @__PURE__ */ React.createElement("div", { style: { position: "relative" } }, /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: showPassword ? "text" : "password",
+      value: password,
+      onChange: (e) => setPassword(e.target.value),
+      placeholder: "Enter password",
+      style: { width: "100%", padding: "14px 48px 14px 16px", borderRadius: 16, border: `1px solid ${T.line}`, background: T.bg, color: T.ink, fontSize: 14 }
+    }
+  ), /* @__PURE__ */ React.createElement("button", { type: "button", onClick: () => setShowPassword(!showPassword), style: { position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", border: "none", background: "transparent", color: T.teal, cursor: "pointer", fontSize: 13, fontWeight: 700 } }, showPassword ? "Hide" : "Show"))), /* @__PURE__ */ React.createElement("button", { onClick: () => onLogin(roleSelection, password), style: { padding: "16px", borderRadius: 18, border: "none", background: "linear-gradient(135deg, #0F766E, #14B8A6)", color: "#fff", fontSize: 15, fontWeight: 800, cursor: "pointer", boxShadow: "0 18px 32px rgba(20,148,142,0.22)" } }, "Continue \u2192"), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 10, padding: "16px", borderRadius: 20, background: T.bg, border: `1px solid ${T.line}` } }, [
+    "\u{1F512} Secure login",
+    "256-bit Encryption",
+    "OTP Verified",
+    "Government Certified"
+  ].map((label) => /* @__PURE__ */ React.createElement("span", { key: label, style: { display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, color: T.slate, padding: "8px 12px", borderRadius: 14, background: T.white } }, /* @__PURE__ */ React.createElement("span", null, label.startsWith("\u{1F512}") ? "\u{1F512}" : "\u2022"), label.replace("\u{1F512} ", ""))))), /* @__PURE__ */ React.createElement("div", { style: { borderRadius: 20, border: `1px solid ${T.line}`, background: T.bg, padding: "18px", display: "grid", gap: 16 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontSize: 12, color: T.slate, textTransform: "uppercase", letterSpacing: "0.18em" } }, "Quick Demo Login"), /* @__PURE__ */ React.createElement("p", { style: { margin: "8px 0 0", fontSize: 13, fontWeight: 700, color: T.ink } }, "Try credentials in one click")), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 12 } }, demoUsers.map((item) => /* @__PURE__ */ React.createElement("div", { key: item.role, style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "14px 16px", borderRadius: 16, background: T.white, border: `1px solid ${T.line}` } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { margin: 0, fontSize: 13, fontWeight: 700, color: T.ink } }, item.label), /* @__PURE__ */ React.createElement("p", { style: { margin: "6px 0 0", fontSize: 12, color: T.slate } }, "Password: ", item.password)), /* @__PURE__ */ React.createElement("button", { type: "button", onClick: () => handleFill(item.role, item.password), style: { padding: "10px 14px", borderRadius: 14, border: "none", background: T.teal, color: T.white, fontSize: 12, fontWeight: 700, cursor: "pointer" } }, "Use")))))))));
 };
 var CitizenApp = () => {
   const { view, setView } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);
-  return /* @__PURE__ */ jsxs("div", { className: "app-shell", style: { minHeight: "100vh", background: T.bg }, children: [
-    /* @__PURE__ */ jsx(CitizenSidebar, { view, setView, open: menuOpen, onClose: () => setMenuOpen(false) }),
-    /* @__PURE__ */ jsxs("div", { style: { marginLeft: 240, minHeight: "100vh", display: "flex", flexDirection: "column" }, children: [
-      /* @__PURE__ */ jsx(Topbar, { onMenu: () => setMenuOpen(true) }),
-      /* @__PURE__ */ jsxs("main", { className: "app-main", style: { flex: 1, padding: "32px 36px 60px" }, children: [
-        view === "home" && /* @__PURE__ */ jsx(HomeView, {}),
-        view === "book" && /* @__PURE__ */ jsx(BookView, {}),
-        view === "booking" && /* @__PURE__ */ jsx(BookingTokenView, {}),
-        view === "notifications" && /* @__PURE__ */ jsx(NotificationsView, {}),
-        view === "profile" && /* @__PURE__ */ jsx(ProfileView, {})
-      ] })
-    ] })
-  ] });
+  return /* @__PURE__ */ React.createElement("div", { className: "app-shell", style: { minHeight: "100vh", background: T.bg } }, /* @__PURE__ */ React.createElement(CitizenSidebar, { view, setView, open: menuOpen, onClose: () => setMenuOpen(false) }), /* @__PURE__ */ React.createElement("div", { style: { marginLeft: 240, minHeight: "100vh", display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement(Topbar, { onMenu: () => setMenuOpen(true) }), /* @__PURE__ */ React.createElement("main", { className: "app-main", style: { flex: 1, padding: "32px 36px 60px" } }, view === "home" && /* @__PURE__ */ React.createElement(HomeView, null), view === "book" && /* @__PURE__ */ React.createElement(BookView, null), view === "booking" && /* @__PURE__ */ React.createElement(BookingTokenView, null), view === "notifications" && /* @__PURE__ */ React.createElement(NotificationsView, null), view === "profile" && /* @__PURE__ */ React.createElement(ProfileView, null))));
 };
 var PortalShell = ({ navItems, title, subtitle, userInitials, children }) => {
-  const { role, setRole, t, lang, setLang } = useApp();
+  const { role, setRole, t, lang, setLang, user, logout: logout2 } = useApp();
   const [menuOpen, setMenuOpen] = useState(false);
-  return /* @__PURE__ */ jsxs("div", { className: "portal-shell", style: { display: "flex", minHeight: "100vh", background: T.bg }, children: [
-    /* @__PURE__ */ jsxs("aside", { className: "premium-sidebar", style: {
-      width: 228,
-      background: "#0d2f2d",
-      position: "fixed",
-      top: 0,
-      bottom: 0,
-      display: "flex",
-      flexDirection: "column",
-      padding: "20px 14px",
-      transform: menuOpen ? "none" : "translateX(-100%)",
-      transition: "transform 0.22s",
-      zIndex: 40
-    }, children: [
-      /* @__PURE__ */ jsx(Brand, {}),
-      /* @__PURE__ */ jsxs("div", { style: {
-        background: "rgba(255,255,255,0.08)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        borderRadius: 8,
-        padding: "8px 12px",
-        margin: "20px 0 14px",
-        display: "flex",
-        gap: 8,
-        alignItems: "center",
-        fontSize: 9,
-        color: "#b9d7d4"
-      }, children: [
-        /* @__PURE__ */ jsx(Icon, { name: "shield", size: 13, color: "#b9d7d4" }),
-        " ",
-        title
-      ] }),
-      /* @__PURE__ */ jsx("nav", { style: { display: "grid", gap: 3 }, children: navItems.map((item, i) => /* @__PURE__ */ jsxs("button", { style: {
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        padding: "10px 11px",
-        borderRadius: 8,
-        border: "none",
-        cursor: "pointer",
-        textAlign: "left",
-        background: i === 0 ? "rgba(255,255,255,0.12)" : "transparent",
-        color: i === 0 ? "#fff" : "#aac3c0",
-        fontSize: 11,
-        fontWeight: 600
-      }, children: [
-        /* @__PURE__ */ jsx(Icon, { name: item.icon, size: 17, color: "currentColor" }),
-        item.label
-      ] }, i)) }),
-      /* @__PURE__ */ jsxs("div", { style: {
-        marginTop: "auto",
-        borderTop: "1px solid rgba(255,255,255,0.1)",
-        paddingTop: 14,
-        display: "flex",
-        gap: 10,
-        alignItems: "center"
-      }, children: [
-        /* @__PURE__ */ jsx(Avatar, { initials: userInitials, size: 32, bg: "rgba(255,255,255,0.14)", color: "#fff" }),
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 10, fontWeight: 700, color: "#fff", margin: 0 }, children: role === "admin" ? "Anita Kapoor" : "Suresh Kumar" }),
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 8, color: "#91aca9", margin: "2px 0 0" }, children: title })
-        ] })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxs("div", { style: { marginLeft: 0, flex: 1, display: "flex", flexDirection: "column" }, children: [
-      /* @__PURE__ */ jsxs("header", { style: {
-        background: T.white,
-        borderBottom: `1px solid ${T.line}`,
-        display: "flex",
-        alignItems: "center",
-        height: 64,
-        padding: "0 28px",
-        gap: 14,
-        position: "sticky",
-        top: 0,
-        zIndex: 20
-      }, children: [
-        /* @__PURE__ */ jsx("button", { onClick: () => setMenuOpen(!menuOpen), style: {
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          padding: 6,
-          borderRadius: 8,
-          color: T.slate
-        }, children: /* @__PURE__ */ jsx(Icon, { name: "menu", size: 20, color: "currentColor" }) }),
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 14, fontWeight: 800, margin: 0, color: T.ink }, children: title }),
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.muted, margin: "2px 0 0" }, children: subtitle })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { style: { marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }, children: [
-          /* @__PURE__ */ jsxs("div", { style: { display: "flex", alignItems: "center", gap: 7 }, children: [
-            /* @__PURE__ */ jsx("span", { style: { fontSize: 11, color: T.muted }, children: t.viewAs }),
-            /* @__PURE__ */ jsxs(
-              "select",
-              {
-                value: role,
-                onChange: (e) => setRole(e.target.value),
-                style: { fontSize: 11, fontWeight: 600, color: T.ink, background: T.bg, border: `1px solid ${T.line}`, borderRadius: 7, padding: "6px 8px", cursor: "pointer" },
-                children: [
-                  /* @__PURE__ */ jsx("option", { value: "citizen", children: t.citizen }),
-                  /* @__PURE__ */ jsx("option", { value: "shopkeeper", children: t.shopkeeper }),
-                  /* @__PURE__ */ jsx("option", { value: "admin", children: t.administrator })
-                ]
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxs("button", { onClick: () => setLang(lang === "en" ? "hi" : "en"), style: {
-            padding: "6px 10px",
-            background: T.bg,
-            border: `1px solid ${T.line}`,
-            borderRadius: 7,
-            cursor: "pointer",
-            color: T.slate,
-            fontSize: 11,
-            fontWeight: 600,
-            display: "flex",
-            alignItems: "center",
-            gap: 5
-          }, children: [
-            /* @__PURE__ */ jsx(Icon, { name: "globe", size: 14, color: "currentColor" }),
-            " ",
-            lang === "en" ? "\u0939\u093F" : "EN"
-          ] }),
-          /* @__PURE__ */ jsx("div", { style: { position: "relative" }, children: /* @__PURE__ */ jsxs("button", { style: {
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            padding: 6,
-            borderRadius: 8,
-            color: T.slate,
-            display: "flex"
-          }, children: [
-            /* @__PURE__ */ jsx(Icon, { name: "bell", size: 20, color: "currentColor" }),
-            /* @__PURE__ */ jsx("span", { style: {
-              position: "absolute",
-              top: 4,
-              right: 4,
-              width: 7,
-              height: 7,
-              background: T.red,
-              borderRadius: "50%",
-              border: `2px solid ${T.white}`
-            } })
-          ] }) }),
-          /* @__PURE__ */ jsx(Avatar, { initials: userInitials, size: 32 })
-        ] })
-      ] }),
-      /* @__PURE__ */ jsx("main", { style: { flex: 1, padding: 28 }, children })
-    ] })
-  ] });
+  const initials = user?.name?.split(" ").map((w) => w[0]).join("") || userInitials;
+  return /* @__PURE__ */ React.createElement("div", { className: "portal-shell", style: { display: "flex", minHeight: "100vh", background: T.bg } }, /* @__PURE__ */ React.createElement("aside", { className: "premium-sidebar", style: {
+    width: 228,
+    background: "#0d2f2d",
+    position: "fixed",
+    top: 0,
+    bottom: 0,
+    display: "flex",
+    flexDirection: "column",
+    padding: "20px 14px",
+    transform: menuOpen ? "none" : "translateX(-100%)",
+    transition: "transform 0.22s",
+    zIndex: 40
+  } }, /* @__PURE__ */ React.createElement(Brand, null), /* @__PURE__ */ React.createElement("div", { style: {
+    background: "rgba(255,255,255,0.08)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: 8,
+    padding: "8px 12px",
+    margin: "20px 0 14px",
+    display: "flex",
+    gap: 8,
+    alignItems: "center",
+    fontSize: 9,
+    color: "#b9d7d4"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "shield", size: 13, color: "#b9d7d4" }), " ", title), /* @__PURE__ */ React.createElement("nav", { style: { display: "grid", gap: 3 } }, navItems.map((item, i) => /* @__PURE__ */ React.createElement("button", { key: i, style: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    padding: "10px 11px",
+    borderRadius: 8,
+    border: "none",
+    cursor: "pointer",
+    textAlign: "left",
+    background: i === 0 ? "rgba(255,255,255,0.12)" : "transparent",
+    color: i === 0 ? "#fff" : "#aac3c0",
+    fontSize: 11,
+    fontWeight: 600
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: item.icon, size: 17, color: "currentColor" }), item.label))), /* @__PURE__ */ React.createElement("div", { style: {
+    marginTop: "auto",
+    borderTop: "1px solid rgba(255,255,255,0.1)",
+    paddingTop: 14,
+    display: "flex",
+    gap: 10,
+    alignItems: "center"
+  } }, /* @__PURE__ */ React.createElement(Avatar, { initials, size: 32, bg: "rgba(255,255,255,0.14)", color: "#fff" }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, fontWeight: 700, color: "#fff", margin: 0 } }, user?.name || (role === "admin" ? "Anita Kapoor" : "Suresh Kumar")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, color: "#91aca9", margin: "2px 0 0" } }, title)), /* @__PURE__ */ React.createElement("button", { onClick: logout2, style: {
+    background: "transparent",
+    border: "1px solid rgba(255,255,255,0.18)",
+    padding: "8px 10px",
+    borderRadius: 9,
+    color: "#fff",
+    cursor: "pointer",
+    fontSize: 10,
+    fontWeight: 700
+  } }, t.logout))), /* @__PURE__ */ React.createElement("div", { style: { marginLeft: 0, flex: 1, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("header", { style: {
+    background: T.white,
+    borderBottom: `1px solid ${T.line}`,
+    display: "flex",
+    alignItems: "center",
+    height: 64,
+    padding: "0 28px",
+    gap: 14,
+    position: "sticky",
+    top: 0,
+    zIndex: 20
+  } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setMenuOpen(!menuOpen), style: {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    padding: 6,
+    borderRadius: 8,
+    color: T.slate
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "menu", size: 20, color: "currentColor" })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14, fontWeight: 800, margin: 0, color: T.ink } }, title), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: "2px 0 0" } }, subtitle)), /* @__PURE__ */ React.createElement("div", { style: { marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 7 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: T.muted } }, t.viewAs), /* @__PURE__ */ React.createElement(
+    "select",
+    {
+      value: role,
+      onChange: (e) => setRole(e.target.value),
+      style: { fontSize: 11, fontWeight: 600, color: T.ink, background: T.bg, border: `1px solid ${T.line}`, borderRadius: 7, padding: "6px 8px", cursor: "pointer" }
+    },
+    /* @__PURE__ */ React.createElement("option", { value: "citizen" }, t.citizen),
+    /* @__PURE__ */ React.createElement("option", { value: "shopkeeper" }, t.shopkeeper),
+    /* @__PURE__ */ React.createElement("option", { value: "admin" }, t.administrator)
+  )), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement(Icon, { name: "globe", size: 14, color: T.slate }), /* @__PURE__ */ React.createElement(
+    "select",
+    {
+      value: lang,
+      onChange: (e) => setLang(e.target.value),
+      "aria-label": "Switch language",
+      style: { fontSize: 11, fontWeight: 600, color: T.ink, background: T.bg, border: `1px solid ${T.line}`, borderRadius: 7, padding: "6px 8px", cursor: "pointer" }
+    },
+    LANG_OPTIONS.map((option) => /* @__PURE__ */ React.createElement("option", { key: option.code, value: option.code }, option.label))
+  )), /* @__PURE__ */ React.createElement("div", { style: { position: "relative" } }, /* @__PURE__ */ React.createElement("button", { style: {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    padding: 6,
+    borderRadius: 8,
+    color: T.slate,
+    display: "flex"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "bell", size: 20, color: "currentColor" }), /* @__PURE__ */ React.createElement("span", { style: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    width: 7,
+    height: 7,
+    background: T.red,
+    borderRadius: "50%",
+    border: `2px solid ${T.white}`
+  } }))), /* @__PURE__ */ React.createElement(Avatar, { initials, size: 32 }), /* @__PURE__ */ React.createElement("button", { onClick: logout2, style: {
+    background: T.bg,
+    border: `1px solid ${T.line}`,
+    borderRadius: 10,
+    padding: "8px 12px",
+    color: T.slate,
+    cursor: "pointer",
+    fontSize: 11,
+    fontWeight: 700
+  } }, t.logout))), /* @__PURE__ */ React.createElement("main", { style: { flex: 1, padding: 28 } }, children)));
 };
 var ShopkeeperApp = () => {
   const { t } = useApp();
@@ -2663,297 +2166,194 @@ var ShopkeeperApp = () => {
     { icon: "box", label: "Stock status" },
     { icon: "clipCheck", label: "Collection log" }
   ];
-  return /* @__PURE__ */ jsxs(PortalShell, { navItems, title: "Shopkeeper portal", subtitle: "Shastri Nagar Fair Price Shop", userInitials: "SK", children: [
-    /* @__PURE__ */ jsxs("div", { style: { maxWidth: 1300, margin: "0 auto" }, children: [
-      /* @__PURE__ */ jsx(
-        PageIntro,
-        {
-          eyebrow: "MONDAY, 29 JUNE",
-          title: "Good morning, Suresh",
-          desc: "Here's today's collection activity at your shop."
-        }
-      ),
-      /* @__PURE__ */ jsx("div", { style: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }, children: [
-        { icon: "calendar", color: T.blue, bg: T.blueLight, label: "TODAY'S BOOKINGS", val: "48", sub: "12 remaining" },
-        { icon: "clock", color: T.amber, bg: T.amberLight, label: "WAITING", val: "8", sub: "Current queue" },
-        { icon: "checkCircle", color: T.green, bg: T.greenLight, label: "COMPLETED", val: "36", sub: "75% complete" },
-        { icon: "box", color: T.purple, bg: T.purpleLight, label: "STOCK STATUS", val: "Available", sub: "Updated 9:12 AM" }
-      ].map((s, i) => /* @__PURE__ */ jsxs("div", { style: {
-        background: T.white,
-        border: `1px solid ${T.line}`,
-        borderRadius: 12,
-        padding: "16px 18px",
-        display: "flex",
-        gap: 12,
-        alignItems: "center"
-      }, children: [
-        /* @__PURE__ */ jsx("div", { style: { width: 40, height: 40, borderRadius: 10, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center" }, children: /* @__PURE__ */ jsx(Icon, { name: s.icon, size: 18, color: s.color }) }),
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 8.5, fontWeight: 800, letterSpacing: "0.7px", color: T.muted, margin: "0 0 5px" }, children: s.label }),
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 18, fontWeight: 800, color: T.ink, margin: "0 0 3px", letterSpacing: "-0.5px" }, children: s.val }),
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 9.5, color: T.muted, margin: 0 }, children: s.sub })
-        ] })
-      ] }, i)) }),
-      /* @__PURE__ */ jsxs("div", { style: { display: "grid", gridTemplateColumns: "minmax(0,1fr) 270px", gap: 18 }, children: [
-        /* @__PURE__ */ jsxs("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14 }, children: [
-          /* @__PURE__ */ jsxs("div", { style: {
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "16px 20px",
-            borderBottom: `1px solid ${T.line}`,
-            gap: 12,
-            flexWrap: "wrap"
-          }, children: [
-            /* @__PURE__ */ jsxs("div", { children: [
-              /* @__PURE__ */ jsx("h3", { style: { fontSize: 14, fontWeight: 700, margin: 0, color: T.ink }, children: "Today's slot list" }),
-              /* @__PURE__ */ jsxs("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" }, children: [
-                SHOP_BOOKINGS.length,
-                " upcoming citizens"
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxs("div", { style: {
-              display: "flex",
-              alignItems: "center",
-              gap: 7,
-              border: `1px solid ${T.line}`,
-              borderRadius: 8,
-              padding: "7px 10px",
-              background: T.bg
-            }, children: [
-              /* @__PURE__ */ jsx(Icon, { name: "sliders", size: 13, color: T.muted }),
-              /* @__PURE__ */ jsx(
-                "input",
-                {
-                  value: search,
-                  onChange: (e) => setSearch(e.target.value),
-                  placeholder: "Search booking or name\u2026",
-                  "aria-label": "Search bookings",
-                  style: {
-                    border: "none",
-                    background: "transparent",
-                    fontSize: 11,
-                    color: T.ink,
-                    outline: "none",
-                    width: 180
-                  }
-                }
-              )
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { style: { overflowX: "auto" }, children: [
-            /* @__PURE__ */ jsx("div", { style: {
-              display: "grid",
-              minWidth: 680,
-              gridTemplateColumns: "90px 100px 1.3fr 1fr 90px 60px",
-              background: T.bg,
-              padding: "9px 18px",
-              fontSize: 8.5,
-              fontWeight: 800,
-              letterSpacing: "0.5px",
-              color: T.muted
-            }, children: ["TIME", "BOOKING", "CITIZEN", "RATION CARD", "STATUS", "ACTION"].map((h) => /* @__PURE__ */ jsx("span", { children: h }, h)) }),
-            filtered.map((b, i) => /* @__PURE__ */ jsxs("div", { style: {
-              display: "grid",
-              minWidth: 680,
-              gridTemplateColumns: "90px 100px 1.3fr 1fr 90px 60px",
-              padding: "12px 18px",
-              borderTop: `1px solid ${T.line}`,
-              alignItems: "center",
-              fontSize: 11,
-              background: b.status === "Arrived" ? "#f0fdf4" : T.white
-            }, children: [
-              /* @__PURE__ */ jsx("span", { style: { fontWeight: 700, color: T.ink }, children: b.time }),
-              /* @__PURE__ */ jsx("span", { style: { color: T.slate }, children: b.id }),
-              /* @__PURE__ */ jsxs("span", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
-                /* @__PURE__ */ jsx(Avatar, { initials: b.name.split(" ").map((x) => x[0]).join(""), size: 26 }),
-                /* @__PURE__ */ jsx("strong", { style: { color: T.ink }, children: b.name })
-              ] }),
-              /* @__PURE__ */ jsx("span", { style: { color: T.slate }, children: b.card }),
-              /* @__PURE__ */ jsx(StatusBadge, { status: b.status }),
-              /* @__PURE__ */ jsx("button", { onClick: doScan, style: {
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                color: T.teal,
-                fontSize: 10,
-                fontWeight: 700,
-                textAlign: "left"
-              }, children: "Scan" })
-            ] }, b.id)),
-            filtered.length === 0 && /* @__PURE__ */ jsx("div", { style: { padding: "32px 20px", textAlign: "center", color: T.muted, fontSize: 13 }, children: "No bookings match your search." })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { style: { display: "grid", gap: 14 }, children: [
-          /* @__PURE__ */ jsxs("button", { onClick: doScan, style: {
-            background: `linear-gradient(140deg, ${T.teal}, ${T.tealMid})`,
-            border: "none",
-            borderRadius: 14,
-            padding: 22,
-            textAlign: "left",
-            cursor: "pointer",
-            color: "#fff"
-          }, children: [
-            /* @__PURE__ */ jsx("div", { style: {
-              width: 44,
-              height: 44,
-              borderRadius: 10,
-              background: "rgba(255,255,255,0.14)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 14
-            }, children: /* @__PURE__ */ jsx(Icon, { name: "scan", size: 22, color: "#fff" }) }),
-            /* @__PURE__ */ jsx("h3", { style: { fontSize: 15, fontWeight: 800, margin: "0 0 6px" }, children: "Scan QR token" }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: "#cce9e6", margin: "0 0 14px", lineHeight: 1.6 }, children: "Verify a citizen's booking and mark their ration as collected." }),
-            /* @__PURE__ */ jsxs("span", { style: { fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }, children: [
-              "Open scanner ",
-              /* @__PURE__ */ jsx(Icon, { name: "arrowUR", size: 13, color: "currentColor" })
-            ] })
-          ] }),
-          /* @__PURE__ */ jsxs("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14 }, children: [
-            /* @__PURE__ */ jsxs("div", { style: {
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "14px 16px",
-              borderBottom: `1px solid ${T.line}`
-            }, children: [
-              /* @__PURE__ */ jsxs("div", { children: [
-                /* @__PURE__ */ jsx("h3", { style: { fontSize: 13, fontWeight: 700, margin: 0, color: T.ink }, children: "Stock overview" }),
-                /* @__PURE__ */ jsx("p", { style: { fontSize: 9, color: T.muted, margin: "3px 0 0" }, children: "Today's availability" })
-              ] }),
-              /* @__PURE__ */ jsx("button", { style: { background: T.bg, border: `1px solid ${T.line}`, borderRadius: 7, padding: "5px 8px", cursor: "pointer", color: T.slate }, children: /* @__PURE__ */ jsx(Icon, { name: "sliders", size: 14, color: "currentColor" }) })
-            ] }),
-            [["Rice", "420 kg", 72, "#0f766e"], ["Wheat", "310 kg", 58, "#0f766e"], ["Sugar", "96 kg", 34, "#d97706"], ["Kerosene", "180 L", 64, "#0f766e"]].map(([name, qty, pct, color]) => /* @__PURE__ */ jsxs("div", { style: { display: "grid", gridTemplateColumns: "80px 1fr 30px", gap: 8, padding: "10px 14px", alignItems: "center" }, children: [
-              /* @__PURE__ */ jsxs("div", { children: [
-                /* @__PURE__ */ jsx("p", { style: { fontSize: 10, fontWeight: 700, margin: "0 0 2px", color: T.ink }, children: name }),
-                /* @__PURE__ */ jsxs("p", { style: { fontSize: 8, color: T.muted, margin: 0 }, children: [
-                  qty,
-                  " remaining"
-                ] })
-              ] }),
-              /* @__PURE__ */ jsx("div", { style: { height: 5, borderRadius: 10, background: T.line, overflow: "hidden" }, children: /* @__PURE__ */ jsx("div", { style: { height: "100%", width: `${pct}%`, background: color, borderRadius: 10 } }) }),
-              /* @__PURE__ */ jsxs("span", { style: { fontSize: 9, color: T.muted, textAlign: "right" }, children: [
-                pct,
-                "%"
-              ] })
-            ] }, name))
-          ] })
-        ] })
-      ] })
-    ] }),
-    (scanning || scanned) && /* @__PURE__ */ jsx("div", { style: {
-      position: "fixed",
-      inset: 0,
-      background: "rgba(15,23,42,0.6)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 100
-    }, role: "dialog", "aria-modal": "true", "aria-label": "QR Verification", children: /* @__PURE__ */ jsxs("div", { style: {
-      background: T.white,
-      borderRadius: 18,
-      padding: 32,
-      width: 340,
-      position: "relative",
-      textAlign: "center",
-      boxShadow: "0 24px 64px rgba(15,23,42,0.28)"
-    }, children: [
-      /* @__PURE__ */ jsx("button", { onClick: () => {
-        setScanned(false);
-        setScanning(false);
-      }, style: {
-        position: "absolute",
-        top: 14,
-        right: 14,
-        background: T.bg,
+  return /* @__PURE__ */ React.createElement(PortalShell, { navItems, title: "Shopkeeper portal", subtitle: "Shastri Nagar Fair Price Shop", userInitials: "SK" }, /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1300, margin: "0 auto" } }, /* @__PURE__ */ React.createElement(
+    PageIntro,
+    {
+      eyebrow: "MONDAY, 29 JUNE",
+      title: "Good morning, Suresh",
+      desc: "Here's today's collection activity at your shop."
+    }
+  ), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 } }, [
+    { icon: "calendar", color: T.blue, bg: T.blueLight, label: "TODAY'S BOOKINGS", val: "48", sub: "12 remaining" },
+    { icon: "clock", color: T.amber, bg: T.amberLight, label: "WAITING", val: "8", sub: "Current queue" },
+    { icon: "checkCircle", color: T.green, bg: T.greenLight, label: "COMPLETED", val: "36", sub: "75% complete" },
+    { icon: "box", color: T.purple, bg: T.purpleLight, label: "STOCK STATUS", val: "Available", sub: "Updated 9:12 AM" }
+  ].map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    background: T.white,
+    border: `1px solid ${T.line}`,
+    borderRadius: 12,
+    padding: "16px 18px",
+    display: "flex",
+    gap: 12,
+    alignItems: "center"
+  } }, /* @__PURE__ */ React.createElement("div", { style: { width: 40, height: 40, borderRadius: 10, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: s.icon, size: 18, color: s.color })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8.5, fontWeight: 800, letterSpacing: "0.7px", color: T.muted, margin: "0 0 5px" } }, s.label), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 18, fontWeight: 800, color: T.ink, margin: "0 0 3px", letterSpacing: "-0.5px" } }, s.val), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 9.5, color: T.muted, margin: 0 } }, s.sub))))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "minmax(0,1fr) 270px", gap: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14 } }, /* @__PURE__ */ React.createElement("div", { style: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "16px 20px",
+    borderBottom: `1px solid ${T.line}`,
+    gap: 12,
+    flexWrap: "wrap"
+  } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: 14, fontWeight: 700, margin: 0, color: T.ink } }, "Today's slot list"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" } }, SHOP_BOOKINGS.length, " upcoming citizens")), /* @__PURE__ */ React.createElement("div", { style: {
+    display: "flex",
+    alignItems: "center",
+    gap: 7,
+    border: `1px solid ${T.line}`,
+    borderRadius: 8,
+    padding: "7px 10px",
+    background: T.bg
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "sliders", size: 13, color: T.muted }), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      value: search,
+      onChange: (e) => setSearch(e.target.value),
+      placeholder: "Search booking or name\u2026",
+      "aria-label": "Search bookings",
+      style: {
         border: "none",
-        cursor: "pointer",
-        borderRadius: 8,
-        padding: 6,
-        color: T.slate
-      }, children: /* @__PURE__ */ jsx(Icon, { name: "x", size: 16, color: "currentColor" }) }),
-      scanning ? /* @__PURE__ */ jsxs("div", { style: { padding: "20px 0" }, children: [
-        /* @__PURE__ */ jsx("div", { style: {
-          width: 80,
-          height: 80,
-          borderRadius: "50%",
-          background: T.tealLight,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          margin: "0 auto 16px"
-        }, children: /* @__PURE__ */ jsx(Icon, { name: "scan", size: 36, color: T.teal }) }),
-        /* @__PURE__ */ jsx("p", { style: { fontSize: 14, fontWeight: 700, color: T.ink, margin: "0 0 6px" }, children: "Scanning\u2026" }),
-        /* @__PURE__ */ jsx("p", { style: { fontSize: 11, color: T.muted }, children: "Hold the QR code in front of the camera" }),
-        /* @__PURE__ */ jsx("div", { style: {
-          width: 200,
-          height: 4,
-          background: T.line,
-          borderRadius: 2,
-          margin: "20px auto 0",
-          overflow: "hidden"
-        }, children: /* @__PURE__ */ jsx("div", { style: {
-          height: "100%",
-          width: "60%",
-          background: T.teal,
-          borderRadius: 2,
-          animation: "scan-progress 1.8s ease-in-out infinite"
-        } }) })
-      ] }) : /* @__PURE__ */ jsxs(Fragment, { children: [
-        /* @__PURE__ */ jsx("div", { style: {
-          width: 56,
-          height: 56,
-          borderRadius: "50%",
-          background: T.greenLight,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          margin: "0 auto 12px"
-        }, children: /* @__PURE__ */ jsx(Icon, { name: "check", size: 26, color: T.green }) }),
-        /* @__PURE__ */ jsx("p", { style: { fontSize: 10, fontWeight: 800, letterSpacing: "1px", color: T.green, margin: "0 0 8px" }, children: "VALID BOOKING" }),
-        /* @__PURE__ */ jsx("h2", { style: { fontSize: 19, fontWeight: 800, margin: "0 0 4px", color: T.ink }, children: "Ravi Sharma" }),
-        /* @__PURE__ */ jsx("p", { style: { fontSize: 11, color: T.muted, margin: "0 0 18px" }, children: "Booking SR-2026-48291 \xB7 10:00 AM" }),
-        /* @__PURE__ */ jsxs("div", { style: {
-          background: T.bg,
-          borderRadius: 9,
-          padding: "11px 14px",
-          display: "flex",
-          gap: 10,
-          alignItems: "center",
-          marginBottom: 18,
-          textAlign: "left"
-        }, children: [
-          /* @__PURE__ */ jsx(Icon, { name: "card", size: 18, color: T.teal }),
-          /* @__PURE__ */ jsxs("div", { children: [
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.6px", color: T.muted, margin: "0 0 3px" }, children: "RATION CARD" }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 12, fontWeight: 700, color: T.ink, margin: 0 }, children: "DL-CEN-2019-4821" })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("button", { onClick: () => {
-          setScanned(false);
-        }, style: {
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          padding: "13px",
-          background: T.teal,
-          color: "#fff",
-          border: "none",
-          borderRadius: 10,
-          cursor: "pointer",
-          fontSize: 13,
-          fontWeight: 700
-        }, children: [
-          /* @__PURE__ */ jsx(Icon, { name: "package", size: 16, color: "#fff" }),
-          " Mark ration as collected"
-        ] })
-      ] })
-    ] }) })
-  ] });
+        background: "transparent",
+        fontSize: 11,
+        color: T.ink,
+        outline: "none",
+        width: 180
+      }
+    }
+  ))), /* @__PURE__ */ React.createElement("div", { style: { overflowX: "auto" } }, /* @__PURE__ */ React.createElement("div", { style: {
+    display: "grid",
+    minWidth: 680,
+    gridTemplateColumns: "90px 100px 1.3fr 1fr 90px 60px",
+    background: T.bg,
+    padding: "9px 18px",
+    fontSize: 8.5,
+    fontWeight: 800,
+    letterSpacing: "0.5px",
+    color: T.muted
+  } }, ["TIME", "BOOKING", "CITIZEN", "RATION CARD", "STATUS", "ACTION"].map((h) => /* @__PURE__ */ React.createElement("span", { key: h }, h))), filtered.map((b, i) => /* @__PURE__ */ React.createElement("div", { key: b.id, style: {
+    display: "grid",
+    minWidth: 680,
+    gridTemplateColumns: "90px 100px 1.3fr 1fr 90px 60px",
+    padding: "12px 18px",
+    borderTop: `1px solid ${T.line}`,
+    alignItems: "center",
+    fontSize: 11,
+    background: b.status === "Arrived" ? "#f0fdf4" : T.white
+  } }, /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, color: T.ink } }, b.time), /* @__PURE__ */ React.createElement("span", { style: { color: T.slate } }, b.id), /* @__PURE__ */ React.createElement("span", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement(Avatar, { initials: b.name.split(" ").map((x) => x[0]).join(""), size: 26 }), /* @__PURE__ */ React.createElement("strong", { style: { color: T.ink } }, b.name)), /* @__PURE__ */ React.createElement("span", { style: { color: T.slate } }, b.card), /* @__PURE__ */ React.createElement(StatusBadge, { status: b.status }), /* @__PURE__ */ React.createElement("button", { onClick: doScan, style: {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    color: T.teal,
+    fontSize: 10,
+    fontWeight: 700,
+    textAlign: "left"
+  } }, "Scan"))), filtered.length === 0 && /* @__PURE__ */ React.createElement("div", { style: { padding: "32px 20px", textAlign: "center", color: T.muted, fontSize: 13 } }, "No bookings match your search."))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gap: 14 } }, /* @__PURE__ */ React.createElement("button", { onClick: doScan, style: {
+    background: `linear-gradient(140deg, ${T.teal}, ${T.tealMid})`,
+    border: "none",
+    borderRadius: 14,
+    padding: 22,
+    textAlign: "left",
+    cursor: "pointer",
+    color: "#fff"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    background: "rgba(255,255,255,0.14)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 14
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "scan", size: 22, color: "#fff" })), /* @__PURE__ */ React.createElement("h3", { style: { fontSize: 15, fontWeight: 800, margin: "0 0 6px" } }, "Scan QR token"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: "#cce9e6", margin: "0 0 14px", lineHeight: 1.6 } }, "Verify a citizen's booking and mark their ration as collected."), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", gap: 5 } }, "Open scanner ", /* @__PURE__ */ React.createElement(Icon, { name: "arrowUR", size: 13, color: "currentColor" }))), /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14 } }, /* @__PURE__ */ React.createElement("div", { style: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "14px 16px",
+    borderBottom: `1px solid ${T.line}`
+  } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: 13, fontWeight: 700, margin: 0, color: T.ink } }, "Stock overview"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 9, color: T.muted, margin: "3px 0 0" } }, "Today's availability")), /* @__PURE__ */ React.createElement("button", { style: { background: T.bg, border: `1px solid ${T.line}`, borderRadius: 7, padding: "5px 8px", cursor: "pointer", color: T.slate } }, /* @__PURE__ */ React.createElement(Icon, { name: "sliders", size: 14, color: "currentColor" }))), [["Rice", "420 kg", 72, "#0f766e"], ["Wheat", "310 kg", 58, "#0f766e"], ["Sugar", "96 kg", 34, "#d97706"], ["Kerosene", "180 L", 64, "#0f766e"]].map(([name, qty, pct, color]) => /* @__PURE__ */ React.createElement("div", { key: name, style: { display: "grid", gridTemplateColumns: "80px 1fr 30px", gap: 8, padding: "10px 14px", alignItems: "center" } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, fontWeight: 700, margin: "0 0 2px", color: T.ink } }, name), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, color: T.muted, margin: 0 } }, qty, " remaining")), /* @__PURE__ */ React.createElement("div", { style: { height: 5, borderRadius: 10, background: T.line, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { height: "100%", width: `${pct}%`, background: color, borderRadius: 10 } })), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 9, color: T.muted, textAlign: "right" } }, pct, "%"))))))), (scanning || scanned) && /* @__PURE__ */ React.createElement("div", { style: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(15,23,42,0.6)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 100
+  }, role: "dialog", "aria-modal": "true", "aria-label": "QR Verification" }, /* @__PURE__ */ React.createElement("div", { style: {
+    background: T.white,
+    borderRadius: 18,
+    padding: 32,
+    width: 340,
+    position: "relative",
+    textAlign: "center",
+    boxShadow: "0 24px 64px rgba(15,23,42,0.28)"
+  } }, /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    setScanned(false);
+    setScanning(false);
+  }, style: {
+    position: "absolute",
+    top: 14,
+    right: 14,
+    background: T.bg,
+    border: "none",
+    cursor: "pointer",
+    borderRadius: 8,
+    padding: 6,
+    color: T.slate
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "x", size: 16, color: "currentColor" })), scanning ? /* @__PURE__ */ React.createElement("div", { style: { padding: "20px 0" } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 80,
+    height: 80,
+    borderRadius: "50%",
+    background: T.tealLight,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "0 auto 16px"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "scan", size: 36, color: T.teal })), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14, fontWeight: 700, color: T.ink, margin: "0 0 6px" } }, "Scanning\u2026"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: T.muted } }, "Hold the QR code in front of the camera"), /* @__PURE__ */ React.createElement("div", { style: {
+    width: 200,
+    height: 4,
+    background: T.line,
+    borderRadius: 2,
+    margin: "20px auto 0",
+    overflow: "hidden"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    height: "100%",
+    width: "60%",
+    background: T.teal,
+    borderRadius: 2,
+    animation: "scan-progress 1.8s ease-in-out infinite"
+  } }))) : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 56,
+    height: 56,
+    borderRadius: "50%",
+    background: T.greenLight,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "0 auto 12px"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "check", size: 26, color: T.green })), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, fontWeight: 800, letterSpacing: "1px", color: T.green, margin: "0 0 8px" } }, "VALID BOOKING"), /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 19, fontWeight: 800, margin: "0 0 4px", color: T.ink } }, "Ravi Sharma"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: T.muted, margin: "0 0 18px" } }, "Booking SR-2026-48291 \xB7 10:00 AM"), /* @__PURE__ */ React.createElement("div", { style: {
+    background: T.bg,
+    borderRadius: 9,
+    padding: "11px 14px",
+    display: "flex",
+    gap: 10,
+    alignItems: "center",
+    marginBottom: 18,
+    textAlign: "left"
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "card", size: 18, color: T.teal }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8, fontWeight: 800, letterSpacing: "0.6px", color: T.muted, margin: "0 0 3px" } }, "RATION CARD"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, fontWeight: 700, color: T.ink, margin: 0 } }, "DL-CEN-2019-4821"))), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    setScanned(false);
+  }, style: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    padding: "13px",
+    background: T.teal,
+    color: "#fff",
+    border: "none",
+    borderRadius: 10,
+    cursor: "pointer",
+    fontSize: 13,
+    fontWeight: 700
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: "package", size: 16, color: "#fff" }), " Mark ration as collected")))));
 };
 var AdminApp = () => {
   const { t } = useApp();
@@ -2973,158 +2373,81 @@ var AdminApp = () => {
     ["Rohini Sector 7 FPS", "North West", "56", "51", "91%"],
     ["Lajpat Nagar FPS", "South East", "44", "40", "90%"]
   ].filter((r) => r[0].toLowerCase().includes(shopSearch.toLowerCase()) || r[1].toLowerCase().includes(shopSearch.toLowerCase()));
-  return /* @__PURE__ */ jsx(PortalShell, { navItems, title: "Administration", subtitle: "National Food Security Service", userInitials: "AK", children: /* @__PURE__ */ jsxs("div", { style: { maxWidth: 1380, margin: "0 auto" }, children: [
-    /* @__PURE__ */ jsx(
-      PageIntro,
-      {
-        eyebrow: "SYSTEM OVERVIEW",
-        title: "Service dashboard",
-        desc: "Live performance across the Smart Ration network."
-      }
-    ),
-    /* @__PURE__ */ jsx("div", { style: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 }, children: [
-      { icon: "users", color: T.blue, bg: T.blueLight, label: "TOTAL USERS", val: "24,862", sub: "\u2191 8.2% this month", subColor: T.green },
-      { icon: "store", color: T.purple, bg: T.purpleLight, label: "RATION SHOPS", val: "142", sub: "138 currently active" },
-      { icon: "calendar", color: T.amber, bg: T.amberLight, label: "TODAY'S BOOKINGS", val: "1,284", sub: "Across all districts" },
-      { icon: "checkCircle", color: T.green, bg: T.greenLight, label: "COMPLETION RATE", val: "87.4%", sub: "\u2191 2.1% vs yesterday", subColor: T.green }
-    ].map((s, i) => /* @__PURE__ */ jsxs("div", { style: {
-      background: T.white,
-      border: `1px solid ${T.line}`,
-      borderRadius: 12,
-      padding: "16px 18px",
-      display: "flex",
-      gap: 12,
-      alignItems: "center"
-    }, children: [
-      /* @__PURE__ */ jsx("div", { style: { width: 40, height: 40, borderRadius: 10, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center" }, children: /* @__PURE__ */ jsx(Icon, { name: s.icon, size: 18, color: s.color }) }),
-      /* @__PURE__ */ jsxs("div", { children: [
-        /* @__PURE__ */ jsx("p", { style: { fontSize: 8.5, fontWeight: 800, letterSpacing: "0.7px", color: T.muted, margin: "0 0 5px" }, children: s.label }),
-        /* @__PURE__ */ jsx("p", { style: { fontSize: 18, fontWeight: 800, color: T.ink, margin: "0 0 3px", letterSpacing: "-0.5px" }, children: s.val }),
-        /* @__PURE__ */ jsx("p", { style: { fontSize: 9.5, color: s.subColor || T.muted, margin: 0, fontWeight: s.subColor ? 600 : 400 }, children: s.sub })
-      ] })
-    ] }, i)) }),
-    /* @__PURE__ */ jsxs("div", { style: { display: "grid", gridTemplateColumns: "1.5fr 0.8fr", gap: 18, marginBottom: 18 }, children: [
-      /* @__PURE__ */ jsxs("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14, padding: "20px 22px" }, children: [
-        /* @__PURE__ */ jsxs("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }, children: [
-          /* @__PURE__ */ jsxs("div", { children: [
-            /* @__PURE__ */ jsx("h3", { style: { fontSize: 14, fontWeight: 700, margin: 0, color: T.ink }, children: "Weekly collection activity" }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" }, children: "Bookings vs completed collections" })
-          ] }),
-          /* @__PURE__ */ jsx(
-            "select",
-            {
-              value: timeRange,
-              onChange: (e) => setTimeRange(e.target.value),
-              style: { fontSize: 11, color: T.ink, background: T.bg, border: `1px solid ${T.line}`, borderRadius: 7, padding: "6px 10px", cursor: "pointer" },
-              children: ["This week", "Last week", "This month"].map((v) => /* @__PURE__ */ jsx("option", { children: v }, v))
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsx(ResponsiveContainer, { width: "100%", height: 200, children: /* @__PURE__ */ jsxs(BarChart, { data: CHART_DATA, barGap: 4, barCategoryGap: "30%", children: [
-          /* @__PURE__ */ jsx(CartesianGrid, { strokeDasharray: "3 3", stroke: T.line, vertical: false }),
-          /* @__PURE__ */ jsx(XAxis, { dataKey: "day", tick: { fontSize: 10, fill: T.muted }, axisLine: false, tickLine: false }),
-          /* @__PURE__ */ jsx(YAxis, { tick: { fontSize: 10, fill: T.muted }, axisLine: false, tickLine: false }),
-          /* @__PURE__ */ jsx(Tooltip, { contentStyle: { borderRadius: 8, border: `1px solid ${T.line}`, fontSize: 11 } }),
-          /* @__PURE__ */ jsx(Bar, { dataKey: "bookings", fill: "#b6ded9", radius: [4, 4, 0, 0], name: "Bookings" }),
-          /* @__PURE__ */ jsx(Bar, { dataKey: "completed", fill: T.teal, radius: [4, 4, 0, 0], name: "Completed" })
-        ] }) }),
-        /* @__PURE__ */ jsx("div", { style: { display: "flex", gap: 16, justifyContent: "center", marginTop: 10 }, children: [{ color: "#b6ded9", label: "Bookings" }, { color: T.teal, label: "Completed" }].map((l) => /* @__PURE__ */ jsxs("span", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 10, color: T.muted }, children: [
-          /* @__PURE__ */ jsx("span", { style: { width: 10, height: 10, borderRadius: 2, background: l.color, display: "inline-block" } }),
-          l.label
-        ] }, l.label)) })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14 }, children: [
-        /* @__PURE__ */ jsxs("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 18px", borderBottom: `1px solid ${T.line}` }, children: [
-          /* @__PURE__ */ jsxs("div", { children: [
-            /* @__PURE__ */ jsx("h3", { style: { fontSize: 14, fontWeight: 700, margin: 0, color: T.ink }, children: "Recent activity" }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" }, children: "System-wide updates" })
-          ] }),
-          /* @__PURE__ */ jsx("button", { style: { background: "transparent", border: "none", cursor: "pointer", color: T.teal, fontSize: 11, fontWeight: 700 }, children: "View all" })
-        ] }),
-        [
-          { icon: "store", title: "New shop registered", desc: "Karol Bagh FPS #118", time: "12 min ago" },
-          { icon: "users", title: "User verification", desc: "28 new users verified", time: "35 min ago" },
-          { icon: "calOff", title: "Holiday added", desc: "Eid al-Adha \xB7 30 June", time: "1 hr ago" },
-          { icon: "box", title: "Low stock alert", desc: "Sugar \xB7 Rohini Sector 7", time: "2 hrs ago" }
-        ].map((item, i) => /* @__PURE__ */ jsxs("div", { style: {
-          display: "flex",
-          gap: 10,
-          padding: "13px 18px",
-          borderBottom: i < 3 ? `1px solid ${T.line}` : "none"
-        }, children: [
-          /* @__PURE__ */ jsx("div", { style: {
-            width: 30,
-            height: 30,
-            borderRadius: 8,
-            background: T.bg,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0
-          }, children: /* @__PURE__ */ jsx(Icon, { name: item.icon, size: 14, color: T.teal }) }),
-          /* @__PURE__ */ jsxs("div", { children: [
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 11, fontWeight: 700, margin: "0 0 2px", color: T.ink }, children: item.title }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.muted, margin: "0 0 2px" }, children: item.desc }),
-            /* @__PURE__ */ jsx("p", { style: { fontSize: 9, color: "#b0bac8", margin: 0 }, children: item.time })
-          ] })
-        ] }, i))
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxs("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14 }, children: [
-      /* @__PURE__ */ jsxs("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderBottom: `1px solid ${T.line}`, flexWrap: "wrap", gap: 10 }, children: [
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("h3", { style: { fontSize: 14, fontWeight: 700, margin: 0, color: T.ink }, children: "Shop performance" }),
-          /* @__PURE__ */ jsx("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" }, children: "Highest volume shops today" })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { style: { display: "flex", alignItems: "center", gap: 7, border: `1px solid ${T.line}`, borderRadius: 8, padding: "7px 10px", background: T.bg }, children: [
-          /* @__PURE__ */ jsx(Icon, { name: "sliders", size: 13, color: T.muted }),
-          /* @__PURE__ */ jsx(
-            "input",
-            {
-              value: shopSearch,
-              onChange: (e) => setShopSearch(e.target.value),
-              placeholder: "Search shops\u2026",
-              "aria-label": "Search shops",
-              style: { border: "none", background: "transparent", fontSize: 11, color: T.ink, outline: "none", width: 150 }
-            }
-          )
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxs("div", { style: { overflowX: "auto" }, children: [
-        /* @__PURE__ */ jsx("div", { style: {
-          display: "grid",
-          minWidth: 680,
-          gridTemplateColumns: "1.6fr 1.2fr 0.7fr 0.7fr 0.7fr 0.7fr",
-          background: T.bg,
-          padding: "9px 20px",
-          fontSize: 8.5,
-          fontWeight: 800,
-          letterSpacing: "0.5px",
-          color: T.muted
-        }, children: ["SHOP", "DISTRICT", "BOOKINGS", "COMPLETED", "RATE", "STATUS"].map((h) => /* @__PURE__ */ jsx("span", { children: h }, h)) }),
-        shopRows.map((row, i) => /* @__PURE__ */ jsxs("div", { style: {
-          display: "grid",
-          minWidth: 680,
-          gridTemplateColumns: "1.6fr 1.2fr 0.7fr 0.7fr 0.7fr 0.7fr",
-          padding: "13px 20px",
-          borderTop: `1px solid ${T.line}`,
-          alignItems: "center",
-          fontSize: 12
-        }, children: [
-          /* @__PURE__ */ jsxs("span", { style: { display: "flex", alignItems: "center", gap: 9 }, children: [
-            /* @__PURE__ */ jsx("div", { style: { width: 30, height: 30, borderRadius: 7, background: T.tealLight, display: "flex", alignItems: "center", justifyContent: "center" }, children: /* @__PURE__ */ jsx(Icon, { name: "store", size: 14, color: T.teal }) }),
-            /* @__PURE__ */ jsx("strong", { style: { color: T.ink }, children: row[0] })
-          ] }),
-          /* @__PURE__ */ jsx("span", { style: { color: T.slate }, children: row[1] }),
-          /* @__PURE__ */ jsx("span", { style: { color: T.slate }, children: row[2] }),
-          /* @__PURE__ */ jsx("span", { style: { color: T.slate }, children: row[3] }),
-          /* @__PURE__ */ jsx("span", { style: { fontWeight: 700, color: T.ink }, children: row[4] }),
-          /* @__PURE__ */ jsx(StatusBadge, { status: "Active" })
-        ] }, i)),
-        shopRows.length === 0 && /* @__PURE__ */ jsx("div", { style: { padding: "28px", textAlign: "center", color: T.muted, fontSize: 13 }, children: "No shops match your search." })
-      ] })
-    ] })
-  ] }) });
+  return /* @__PURE__ */ React.createElement(PortalShell, { navItems, title: "Administration", subtitle: "National Food Security Service", userInitials: "AK" }, /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 1380, margin: "0 auto" } }, /* @__PURE__ */ React.createElement(
+    PageIntro,
+    {
+      eyebrow: "SYSTEM OVERVIEW",
+      title: "Service dashboard",
+      desc: "Live performance across the Smart Ration network."
+    }
+  ), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 22 } }, [
+    { icon: "users", color: T.blue, bg: T.blueLight, label: "TOTAL USERS", val: "24,862", sub: "\u2191 8.2% this month", subColor: T.green },
+    { icon: "store", color: T.purple, bg: T.purpleLight, label: "RATION SHOPS", val: "142", sub: "138 currently active" },
+    { icon: "calendar", color: T.amber, bg: T.amberLight, label: "TODAY'S BOOKINGS", val: "1,284", sub: "Across all districts" },
+    { icon: "checkCircle", color: T.green, bg: T.greenLight, label: "COMPLETION RATE", val: "87.4%", sub: "\u2191 2.1% vs yesterday", subColor: T.green }
+  ].map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    background: T.white,
+    border: `1px solid ${T.line}`,
+    borderRadius: 12,
+    padding: "16px 18px",
+    display: "flex",
+    gap: 12,
+    alignItems: "center"
+  } }, /* @__PURE__ */ React.createElement("div", { style: { width: 40, height: 40, borderRadius: 10, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: s.icon, size: 18, color: s.color })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 8.5, fontWeight: 800, letterSpacing: "0.7px", color: T.muted, margin: "0 0 5px" } }, s.label), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 18, fontWeight: 800, color: T.ink, margin: "0 0 3px", letterSpacing: "-0.5px" } }, s.val), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 9.5, color: s.subColor || T.muted, margin: 0, fontWeight: s.subColor ? 600 : 400 } }, s.sub))))), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1.5fr 0.8fr", gap: 18, marginBottom: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14, padding: "20px 22px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: 14, fontWeight: 700, margin: 0, color: T.ink } }, "Weekly collection activity"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" } }, "Bookings vs completed collections")), /* @__PURE__ */ React.createElement(
+    "select",
+    {
+      value: timeRange,
+      onChange: (e) => setTimeRange(e.target.value),
+      style: { fontSize: 11, color: T.ink, background: T.bg, border: `1px solid ${T.line}`, borderRadius: 7, padding: "6px 10px", cursor: "pointer" }
+    },
+    ["This week", "Last week", "This month"].map((v) => /* @__PURE__ */ React.createElement("option", { key: v }, v))
+  )), /* @__PURE__ */ React.createElement(ResponsiveContainer, { width: "100%", height: 200 }, /* @__PURE__ */ React.createElement(BarChart, { data: CHART_DATA, barGap: 4, barCategoryGap: "30%" }, /* @__PURE__ */ React.createElement(CartesianGrid, { strokeDasharray: "3 3", stroke: T.line, vertical: false }), /* @__PURE__ */ React.createElement(XAxis, { dataKey: "day", tick: { fontSize: 10, fill: T.muted }, axisLine: false, tickLine: false }), /* @__PURE__ */ React.createElement(YAxis, { tick: { fontSize: 10, fill: T.muted }, axisLine: false, tickLine: false }), /* @__PURE__ */ React.createElement(Tooltip, { contentStyle: { borderRadius: 8, border: `1px solid ${T.line}`, fontSize: 11 } }), /* @__PURE__ */ React.createElement(Bar, { dataKey: "bookings", fill: "#b6ded9", radius: [4, 4, 0, 0], name: "Bookings" }), /* @__PURE__ */ React.createElement(Bar, { dataKey: "completed", fill: T.teal, radius: [4, 4, 0, 0], name: "Completed" }))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 16, justifyContent: "center", marginTop: 10 } }, [{ color: "#b6ded9", label: "Bookings" }, { color: T.teal, label: "Completed" }].map((l) => /* @__PURE__ */ React.createElement("span", { key: l.label, style: { display: "flex", alignItems: "center", gap: 6, fontSize: 10, color: T.muted } }, /* @__PURE__ */ React.createElement("span", { style: { width: 10, height: 10, borderRadius: 2, background: l.color, display: "inline-block" } }), l.label)))), /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 18px", borderBottom: `1px solid ${T.line}` } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: 14, fontWeight: 700, margin: 0, color: T.ink } }, "Recent activity"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" } }, "System-wide updates")), /* @__PURE__ */ React.createElement("button", { style: { background: "transparent", border: "none", cursor: "pointer", color: T.teal, fontSize: 11, fontWeight: 700 } }, "View all")), [
+    { icon: "store", title: "New shop registered", desc: "Karol Bagh FPS #118", time: "12 min ago" },
+    { icon: "users", title: "User verification", desc: "28 new users verified", time: "35 min ago" },
+    { icon: "calOff", title: "Holiday added", desc: "Eid al-Adha \xB7 30 June", time: "1 hr ago" },
+    { icon: "box", title: "Low stock alert", desc: "Sugar \xB7 Rohini Sector 7", time: "2 hrs ago" }
+  ].map((item, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    display: "flex",
+    gap: 10,
+    padding: "13px 18px",
+    borderBottom: i < 3 ? `1px solid ${T.line}` : "none"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    background: T.bg,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0
+  } }, /* @__PURE__ */ React.createElement(Icon, { name: item.icon, size: 14, color: T.teal })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, fontWeight: 700, margin: "0 0 2px", color: T.ink } }, item.title), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: "0 0 2px" } }, item.desc), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 9, color: "#b0bac8", margin: 0 } }, item.time)))))), /* @__PURE__ */ React.createElement("div", { style: { background: T.white, border: `1px solid ${T.line}`, borderRadius: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderBottom: `1px solid ${T.line}`, flexWrap: "wrap", gap: 10 } }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { style: { fontSize: 14, fontWeight: 700, margin: 0, color: T.ink } }, "Shop performance"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 10, color: T.muted, margin: "3px 0 0" } }, "Highest volume shops today")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 7, border: `1px solid ${T.line}`, borderRadius: 8, padding: "7px 10px", background: T.bg } }, /* @__PURE__ */ React.createElement(Icon, { name: "sliders", size: 13, color: T.muted }), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      value: shopSearch,
+      onChange: (e) => setShopSearch(e.target.value),
+      placeholder: "Search shops\u2026",
+      "aria-label": "Search shops",
+      style: { border: "none", background: "transparent", fontSize: 11, color: T.ink, outline: "none", width: 150 }
+    }
+  ))), /* @__PURE__ */ React.createElement("div", { style: { overflowX: "auto" } }, /* @__PURE__ */ React.createElement("div", { style: {
+    display: "grid",
+    minWidth: 680,
+    gridTemplateColumns: "1.6fr 1.2fr 0.7fr 0.7fr 0.7fr 0.7fr",
+    background: T.bg,
+    padding: "9px 20px",
+    fontSize: 8.5,
+    fontWeight: 800,
+    letterSpacing: "0.5px",
+    color: T.muted
+  } }, ["SHOP", "DISTRICT", "BOOKINGS", "COMPLETED", "RATE", "STATUS"].map((h) => /* @__PURE__ */ React.createElement("span", { key: h }, h))), shopRows.map((row, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    display: "grid",
+    minWidth: 680,
+    gridTemplateColumns: "1.6fr 1.2fr 0.7fr 0.7fr 0.7fr 0.7fr",
+    padding: "13px 20px",
+    borderTop: `1px solid ${T.line}`,
+    alignItems: "center",
+    fontSize: 12
+  } }, /* @__PURE__ */ React.createElement("span", { style: { display: "flex", alignItems: "center", gap: 9 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 30, height: 30, borderRadius: 7, background: T.tealLight, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "store", size: 14, color: T.teal })), /* @__PURE__ */ React.createElement("strong", { style: { color: T.ink } }, row[0])), /* @__PURE__ */ React.createElement("span", { style: { color: T.slate } }, row[1]), /* @__PURE__ */ React.createElement("span", { style: { color: T.slate } }, row[2]), /* @__PURE__ */ React.createElement("span", { style: { color: T.slate } }, row[3]), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, color: T.ink } }, row[4]), /* @__PURE__ */ React.createElement(StatusBadge, { status: "Active" }))), shopRows.length === 0 && /* @__PURE__ */ React.createElement("div", { style: { padding: "28px", textAlign: "center", color: T.muted, fontSize: 13 } }, "No shops match your search.")))));
 };
 function SmartRation() {
   const [role, setRole] = useState("citizen");
@@ -3133,22 +2456,51 @@ function SmartRation() {
   const [toast, setToast] = useState(null);
   const [booking, setBooking] = useState(null);
   const [notifCount, setNotifCount] = useState(3);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authError, setAuthError] = useState(null);
   const t = i18n[lang] || i18n.en;
   const toastTimerRef = useRef(null);
-  const showToast = useCallback((msg) => {
+  const showToast2 = useCallback((msg) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast(msg);
     toastTimerRef.current = setTimeout(() => setToast(null), 3e3);
   }, []);
+  const login = (selectedRole, password) => {
+    const user2 = AUTH_USERS[selectedRole];
+    if (user2 && user2.password === password) {
+      setIsAuthenticated(true);
+      setUser({ name: user2.name, role: user2.role });
+      setRole(user2.role);
+      setView("home");
+      setAuthError(null);
+      showToast2({ message: `Signed in as ${user2.name}`, type: "success" });
+      return;
+    }
+    setAuthError("Invalid role or password. Please try again.");
+  };
+  const logout2 = () => {
+    setIsAuthenticated(false);
+    setUser(null);
+    setRole("citizen");
+    setView("home");
+    showToast2({ message: "Signed out", type: "info" });
+  };
+  const handleRoleChange = (nextRole) => {
+    if (isAuthenticated && user?.role && nextRole !== user.role) {
+      showToast2({ message: "Please sign out and sign in with the new role.", type: "info" });
+      return;
+    }
+    setRole(nextRole);
+  };
   useEffect(() => () => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
   }, []);
   useEffect(() => {
     setView("home");
   }, [role]);
-  const ctx = { role, setRole, view, setView, lang, setLang, t, showToast, booking, setBooking, notifCount, setNotifCount };
-  return /* @__PURE__ */ jsxs(AppCtx.Provider, { value: ctx, children: [
-    /* @__PURE__ */ jsx("style", { children: `
+  const ctx = { role, setRole: handleRoleChange, view, setView, lang, setLang, t, showToast: showToast2, booking, setBooking, notifCount, setNotifCount, isAuthenticated, user, authError, login, logout: logout2 };
+  return /* @__PURE__ */ React.createElement(AppCtx.Provider, { value: ctx }, /* @__PURE__ */ React.createElement("style", null, `
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { font-family: 'Inter', -apple-system, sans-serif; font-size: 14px; background: linear-gradient(180deg, #f7fbfd 0%, #eef4f9 100%); color: ${T.ink}; }
@@ -3246,17 +2598,25 @@ function SmartRation() {
         }
         @media (max-width: 900px) {
           .citizen-sidebar { transform: none !important; }
+          .login-grid { grid-template-columns: 1fr !important; }
+          .login-page { padding: 24px 14px !important; }
+          .login-left, .login-right { width: 100%; max-width: none !important; }
+          .login-left { padding: 32px 26px !important; }
+          .login-right { padding: 30px 24px !important; }
+          .login-left-inner { gap: 22px !important; }
         }
-      ` }),
-    role === "citizen" && /* @__PURE__ */ jsx(CitizenApp, {}),
-    role === "shopkeeper" && /* @__PURE__ */ jsx(ShopkeeperApp, {}),
-    role === "admin" && /* @__PURE__ */ jsx(AdminApp, {}),
-    /* @__PURE__ */ jsx(Toast, { toast })
-  ] });
+        @media (max-width: 680px) {
+          .login-left, .login-right { border-radius: 24px !important; }
+          .login-left-inner { gap: 16px !important; }
+          .login-gov, .login-hero { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+          .login-left select { width: 100%; }
+          .login-right { padding: 24px 18px !important; }
+          .login-right button, .login-right input, .login-right select { min-height: 48px; }
+        }
+      `), !isAuthenticated ? /* @__PURE__ */ React.createElement(LoginView, { onLogin: login, authError }) : /* @__PURE__ */ React.createElement(React.Fragment, null, role === "citizen" && /* @__PURE__ */ React.createElement(CitizenApp, null), role === "shopkeeper" && /* @__PURE__ */ React.createElement(ShopkeeperApp, null), role === "admin" && /* @__PURE__ */ React.createElement(AdminApp, null)), /* @__PURE__ */ React.createElement(Toast, { toast }));
 }
 
 // main.jsx
-import { jsx as jsx2 } from "react/jsx-runtime";
 createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsx2(React.StrictMode, { children: /* @__PURE__ */ jsx2(SmartRation, {}) })
+  /* @__PURE__ */ React2.createElement(React2.StrictMode, null, /* @__PURE__ */ React2.createElement(SmartRation, null))
 );
